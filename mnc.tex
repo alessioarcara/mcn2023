@@ -1,0 +1,91 @@
+\documentclass{article}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\newtheorem*{definition}{\color{red}\textbf{Definizione}}
+\newtheorem*{theorem}{\color{green}\textbf{Teorema}}
+\newenvironment{example}
+{\begin{center}
+        \begin{tabular}{|p{0.9\textwidth}|}
+            \hline \\ 
+            \textit{Esempio}: \\\\ 
+        }
+        {
+            \\\\ \hline
+        \end{tabular}
+    \end{center}
+}
+\setlength\parindent{0pt}
+
+\begin{document}
+\section{Aritmetica computazionale}
+\subsubsection{Rappresentazione dei numeri reali}
+I \textbf{numeri finiti} sono utilizzati dai calcolatori per rappresentare i numeri reali poiché
+questi ultimi possono avere un numero infinito di cifre, che i calcolatori, avendo una
+memoria limitata, non sono in grado di rappresentare. 
+
+\begin{theorem}[Rappresentazione in base]
+    Sia $\alpha$ un numero reale non nullo. Possiamo rappresentare tale numero con una base
+    $\beta\geq 2$, un numero intero scelto da noi, nel seguente modo:
+    \begin{equation}
+        \begin{aligned}
+            \alpha&=\pm(\alpha_1\beta^{-1}+\alpha_2\beta^{-2}+\ldots)\beta^p \\ 
+            \alpha&=\pm(\sum_{i=1}^{\infty}\alpha_i\beta^{-i})\beta^p
+        \end{aligned}
+    \end{equation}
+    I vari termini dell'uguaglianza vengono detti:
+    $$\begin{array}{lll}
+        \beta & & \text{base} \\ 
+        p & & \text{esponente} \\ 
+        \alpha_i & & \text{cifre del numero} \\
+        \sum_{i=1}^{\infty}\alpha_i\beta^{-i} & & \text{mantissa}
+    \end{array}$$
+    Ogni cifra $\alpha_i$ è un numero intero che varia tra 0 e $\beta-1$. Ad esempio, se lavoriamo in base
+    10, le cifre saranno numeri interi compresi tra 0 e 9.\\ 
+    Per garantire l'unicità della rappresentazione, è necessario che $\alpha_1\neq 0$. 
+    Se così non fosse, il numero 13 potrebbe essere rappresentato come 13, 013, 0013, eccetera,
+    il che va contro l'unicità della rappresentazione.
+\end{theorem}
+Possiamo scrivere un numero $\alpha\in\mathbb{R}$ con $\alpha\neq 0$ in due modi:
+\begin{enumerate}
+    \item \textbf{forma mista}.
+        $$\alpha=\begin{cases}
+            \pm(0.000\alpha_1\alpha_2\ldots)_\beta & p\leq 0\\
+            \pm(\alpha_1\alpha_2\ldots)_\beta & p>0
+        \end{cases}$$
+    \item \textbf{forma scientifica}. L'idea è quella di spostare il punto decimale al primo numero $\neq 0$ e
+        poi moltiplicare il tutto per $\beta^p$ per riportare il numero al suo valore originale.
+        $$\alpha=\pm0.\alpha_1\alpha_2\ldots\cdot\beta^p$$
+        \begin{example}
+            \begin{equation*}
+               \begin{aligned}
+                   \alpha&=(12.37)_{10} & \alpha&=0.12237\cdot 10^2 \\
+                   \alpha&=(0.0045)_{10} & \alpha&=0.45\cdot 10^{-2} \\ 
+                         & & &=(4\cdot 10^{-1}+5\cdot 10^{-2})\cdot 10^{-2}
+               \end{aligned} 
+            \end{equation*}
+        \end{example}
+\end{enumerate}
+\begin{definition}[Numeri finiti]
+    L'insieme $\mathbb{F}$ dei numeri finiti è definito come l'insieme dei numeri espressi in base $\beta$
+    (dove $\beta\geq 2$), utilizzando $t$ cifre (con $t\geq 1$). Poiché anche l'esponente $p$
+    potrebbe essere così grande da non poter essere rappresentato, è necessario limitare
+    l'intervallo degli esponenti rappresentabili. Qui, $\lambda$ indica il più piccolo esponente che
+    può essere rappresentato e $\omega$ il più grande esponente rappresentabile.
+    \begin{equation*}
+        \begin{aligned}
+            \mathbb{F}(\beta,t,\lambda,\omega)&=\{0\}\cup\{\alpha\in\mathbb{R}:\alpha=\pm0.\alpha_1\alpha_2\ldots\alpha_t\cdot\beta^p\} \\
+                              &=\{0\}\cup\{\alpha\in\mathbb{R}:\alpha=\pm(\sum_{i=1}^{t}\alpha_i\beta^{-i})\beta^p\}
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+\begin{example}
+    
+\end{example}
+\end{document}
