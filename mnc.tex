@@ -10,8 +10,11 @@
 \usepackage{enumitem}
 \graphicspath{ {./images/} }
 
+\renewcommand*{\proofname}{Dimostrazione.}
+\renewcommand\qedsymbol{$\blacksquare$}
 \newtheorem*{definition}{\color{red}\textbf{Definizione}}
 \newtheorem*{theorem}{\color{green}\textbf{Teorema}}
+\newtheorem*{corollary}{\color{violet}\textbf{Corollario}}
 \newtheorem*{oss}{Osservazione}
 
 \newenvironment{example}
@@ -316,27 +319,6 @@ Questo meccanismo è chiamato \textbf{gradual underflow}.\\
 Per rappresentare questi numeri estremamente piccoli, si fa uso della
 rappresentazione \textbf{denormalizzata}. In questa rappresentazione, la
 mantissa  non inizia con il solito bit implicito di 1, ma  con una serie di 0.
-\subsection{Errori di rappresentazione}
-\begin{definition}\leavevmode\
-    Consideriamo un valore $\alpha\in \mathbb{R}$. Se $\alpha\notin
-    \mathbb{F}(\beta,t,\lambda,\omega)$, allora la sua migliore
-    approssimazione all'interno di questo insieme è data da $\tilde\alpha\in
-    \mathbb{F}(\beta,t,\lambda,\omega)$. L'approssimazione di $\alpha$ con
-    $\tilde\alpha$ introduce un \textbf{errore di rappresentazione}. Per quantificare
-    tale errore, definiamo le seguenti metriche:
-    {
-        \renewcommand{\arraystretch}{1.5}
-        \begin{center}
-           \begin{tabular}{ll}
-                $E_{abs}=\lvert \alpha-fl(\alpha)\rvert$ & errore assoluto \\
-                $E_{rel}=\lvert \frac{\alpha-fl(\alpha)}{\alpha}\rvert\text{ se
-            }\alpha\neq0$ & errore relativo 
-           \end{tabular}
-        \end{center}
-    }
-\end{definition}
-Nel calcolo scientifico, l'errore relativo è preferito poiché fornisce una
-misura dell'errore ``normalizzata'', che non dipende dalla grandezza dei numeri confrontati.
 \begin{example}
     Si eseguano i passi necessari per rappresentare il numero reale
     $(-13.9)_{10}$ in un'area di memoria di 8 bit (1 per il segno, 3 per
@@ -421,7 +403,292 @@ misura dell'errore ``normalizzata'', che non dipende dalla grandezza dei numeri 
         \end{center}
     \end{enumerate}
 \end{example}
+\subsection{Errori di rappresentazione}
+\begin{definition}\leavevmode\
+    Consideriamo un valore $\alpha\in \mathbb{R}$. Se $\alpha\notin
+    \mathbb{F}(\beta,t,\lambda,\omega)$, allora la sua migliore
+    approssimazione all'interno di questo insieme è data da $\tilde\alpha\in
+    \mathbb{F}(\beta,t,\lambda,\omega)$. L'approssimazione di $\alpha$ con
+    $\tilde\alpha$ introduce un \textbf{errore di rappresentazione}. Per quantificare
+    tale errore, definiamo le seguenti metriche:
+    {
+        \renewcommand{\arraystretch}{1.5}
+        \begin{center}
+           \begin{tabular}{ll}
+                $E_{abs}=\lvert \alpha-fl(\alpha)\rvert$ & errore assoluto \\
+                $E_{rel}=\lvert \frac{\alpha-fl(\alpha)}{\alpha}\rvert\text{ se
+            }\alpha\neq0$ & errore relativo 
+           \end{tabular}
+        \end{center}
+    }
+\end{definition}
+Nel calcolo scientifico, l'errore relativo è preferito poiché fornisce una
+misura dell'errore ``normalizzata'', che non dipende dalla grandezza dei numeri confrontati.
 \begin{example}
-    
+    Si converta quanto rappresentato nell'esempio precedente nuovamente in
+    base 10. Successivamente, si valuti l'errore assoluto e l'errore relativo
+    della rappresentazione.
+    \begin{enumerate}
+        \setcounter{enumi}{5}
+        \item\textbf{Decodifica}: per riconvertire il numero floating point
+            appena determinato, faremo:
+            \begin{center}
+                 \begin{tabular}{ll}
+                     arrotondamento & troncamento \\ 
+                     $(-1.1100)_2\times2^{(110)_2}$ & $(-1.1011)_2\times2^{(110)_2}$ \\ 
+                     $(-1.1100)_2\times2^{(3)_{10}}$ & $(-1.1011)_2\times2^{(3)_{10}}$ \\ 
+                     $(-1110.0)_2$ & $(-1101.1)_2$ \\ 
+                     $-(8+4+2+0+0)_{10}$ & $-(8+4+0+1+0.5)_{10}$ \\ 
+                     $-(14)_{10}$ & $-(13.5)_{10}$ \\ 
+                 \end{tabular}
+            \end{center}
+            \begin{center}
+                \begin{tabular}{l|l|l}
+                    & arrotondamento & troncamento \\
+                    \hline
+                    errore assoluto & $-13.9 - (-14) = 0.1$ & $-13.9 - (-13.5) = -0.4$ \\
+                    \hline
+                    errore relativo & $\frac{0.1}{-13.9} = -0.0072$ & $\frac{-0.4}{-13.9} = 0.0288$
+                \end{tabular} 
+            \end{center}
+   \end{enumerate} 
 \end{example}
+\begin{definition}
+    Dato l'insieme dei numeri finiti $\mathbb{F}(\beta,t,\lambda,\omega)$, si
+    dice \textbf{unità di arrotondamento} e la si indica con $u$, la quantità:
+    $$u=\begin{cases}
+        \beta^{1-t} & \text{per troncamento} \\ 
+        \frac{1}{2}\beta^{1-t} & \text{per arrotondamento}
+    \end{cases}$$
+\end{definition}
+\begin{theorem}
+   Per ogni $\alpha\in \mathbb{R}$ e $\alpha\notin0$ vale
+   $$\Big\lvert \frac{\alpha-fl(\alpha)}{\alpha}\Big\rvert=u$$
+\end{theorem}
+Il teorema afferma che $u$, l'unità di arrotondamento, rappresenta il
+\underline{limite superiore} dell'errore relativo quando si rappresenta 
+un numero reale in un formato numerico finito.
+\begin{example}
+    Consideriamo l'insieme dei numeri finiti $\mathbb{F}(2,5,-3,4)$. Calcolare l'unità di arrotondamento $u$ sia nel caso di troncamento che di
+    arrotondamento.
+    $$u=\begin{cases}
+        2^{1-5}=\frac{1}{16}=0.0625 & \text{per
+        troncamento} \\
+        \frac{1}{2}\cdot2^{1-5}=\frac{1}{32}=0.0325 & \text{per arrotondamento}
+    \end{cases}$$
+\end{example}
+Indicheremo con $\epsilon$ l'errore relativo.
+\begin{corollary}
+    Per ogni $\alpha\in \mathbb{R}$ e $\alpha\notin0$ vale 
+    $$  fl(\alpha)=\alpha(1\pm\epsilon),\quad \text{con }\lvert 
+      \epsilon\rvert<u $$
+\end{corollary} 
+\begin{proof}\leavevmode\\
+    Banalmente dato $\epsilon=\frac{\alpha-fl(\alpha)}{\alpha}$,
+    per il Teorema si ha che $\lvert \epsilon\rvert<u$ e
+    $fl(\alpha)=\alpha\epsilon+\alpha=\alpha(1+\epsilon)$.
+\end{proof}
+\paragraph{Precisione desiderata in base 10.}
+La questione chiave è: quante cifre in base 10 sono necessarie per
+rappresentare con precisione ciò che è memorizzato in base 2? 
+
+Supponiamo di avere un numero rappresentato con $t$ cifre in base 2. Vogliamo
+sapere a quante cifre, $s$, in base 10 questo corrisponde.
+
+Partendo dall'equazione:
+$$2^{-t}=10^{-s}$$
+e applicando il logaritmo in base 10 ad entrambi i lati:
+$$-t\times\log_{10}(2)=-s$$
+da qui possiamo isolare $s$:
+$$s=t\times\log_{10}(2)$$
+usando un'approssimazione per il logaritmo:
+$$s \approx t \times 0.30103$$
+
+Per esempio:
+\begin{itemize}
+\item Nella precisione `basic single', con \( t = 24 \) cifre in base 2 per la mantissa, abbiamo:
+$$s \approx 24 \times 0.30103 \approx 7.224$$
+\item Nella precisione `basic double', con \( t = 53 \) cifre in base 2 per la mantissa, abbiamo:
+$$s \approx 53 \times 0.30103 \approx 15.95459$$
+\end{itemize}
+Questo indica che ci servono circa 7-8 cifre in `basic single' o circa 16
+cifre in `basic double' in base 10 per rappresentare con
+precisione ciò che è memorizzato in base 2. Utilizzando meno cifre, stiamo
+arrotondando e potremmo perdere informazioni.
+
+Possiamo calcolare l'unità di arrotondamento $u$ per `basic single' e `basic
+double':
+\begin{itemize}
+    \item $u_{single}= \frac{1}{2} \times 2^{1-24}=2^-24\approx 5.96 \times
+        10 ^{-8}$ 
+    \item $u_{double}= \frac{1}{2} \times 2^{1-53}=2^-53\approx 1.116 \times
+        10 ^{-16}$ 
+\end{itemize}
+Ora, se confrontiamo questi valori con le cifre necessarie in base 10 per
+una rappresentazione accurata, notiamo una relazione. Le cifre necessarie
+sono legate all'ordine di grandezza dell'unità di arrotondamento.
+
+Questi valori forniscono un indicatore sull'ordine di grandezza minimo dei 
+numeri che possono essere rappresentati accuratamente e sul numero massimo di 
+cifre che possiamo stampare senza perdere informazioni.
+\subsection{Aritmetica finita}
+Dati due numeri $a$ e $b$ appartenenti a $\mathbb{F}(\beta,t,\lambda,\omega)$,
+l'operazione $a\ op\ b$ potrebbe produrre un risultato che non è contenuto in
+$\mathbb{F}(\beta,t,\lambda,\omega)$.
+\begin{example}
+    Siano $a=(0.34)_{10}\times10^{0}$ e $b=(0.12)_{10}\times10^{-2}\in
+    \mathbb{F}(10,2,\lambda,\omega)$. Eseguendo la somma si ha: 
+    $$0.34+0.0012=0.3412$$
+    ma, $0.3412\notin \mathbb{F}(10,2,\lambda,\omega)$.
+\end{example}
+Per eseguire le operazioni in questo dominio, vengono definiti degli
+operatori specifici, che indichiamo con $\tilde{op}$ (ad esempio, $\tilde{+},
+\tilde{-}, \tilde{*}, \tilde{/}$).
+\begin{definition}
+    L'operatore $\tilde{op}$ tra due numeri $a,b\in \mathbb{F}$ è definito nel modo seguente:
+    $$a\ \tilde{op}\ b=fl(a\ op\ b)$$
+    Questo significa che viene prima eseguita l'operazione in aritmetica
+    esatta, e il risultato viene arrotondato per rientrare nell'insieme di
+    numeri finiti $\mathbb{F}$.
+\end{definition}
+Per soddisfare tali requisiti, si utilizzano dei registri posizionati vicino 
+al processore. Questi registri, dotati di bit aggiuntivi, 
+rispetto a quelli della mantissa, permettono di eseguire operazioni con una
+precisione superiore rispetto a quella raggiungibile con solo $t$ bit. Tale
+maggiore precisione assicura che, arrotondando a $t$ cifre, il risultato ottenuto
+aderisce alla definizione delineata sopra. Idealmente, un registro di lunghezza
+$t+1$ bit, superiore a quella della mantissa stessa, garantirebbe la
+conformità a questa definizione.
+\vskip 0.1in
+\paragraph{Errore in aritmetica finita.}
+Qual'è l'errore massimo che possiamo commettere durante un operazione con numeri
+finiti?
+Consideriamo l'errore relativo tra il risultato ottenuto in aritmetica finita
+e quello in aritmetica esatta, si può notare un interessante comportamento. 
+Notiamo che, il risultato esatto di $(a\ op\ b)$ è un numero $\alpha\in
+\mathbb{R}$. Per definizione, in aritmetica finita, $(a\ \tilde{op}\ b)$ è
+l'approssimazione floating-point di $\alpha$.
+Allora, per il teorema sopra menzionato, possiamo dedurre che l'errore relativo massimo tra
+$\alpha$ e $fl(\alpha)$ è minore dell'unità di arrotondamento $u$. Questo
+significa che $u$ rappresenta l'errore relativo massimo che possiamo
+aspettarci in una singola operazione in aritmetica finita.
+Estendendo questa logica, se effettuiamo una serie di $n$ operazioni, l'errore
+totale potrebbe essere al più $nu$.
+$$\Big\lvert \frac{\overset{fl(\alpha)}{\overbrace{(a\ \tilde{op}\ b)}}-\overset{\alpha}{\overbrace{(a\ op\
+b)}}}{\underset{\alpha}{\underbrace{a\ op\ b}}}\Big\rvert<u$$
+\paragraph{Proprietà associativa.} La proprietà associativa afferma che
+l'ordine in cui si raggruppano i termini durante un'operazione non modifica il
+risultato. Tuttavia, essa, così come le altre proprietà, \underline{non} vale nell'aritmetica finita.
+\begin{example}
+    Considerati $a=0.11\times10^0,b=0.13\times10^{-1},c=0.14\times10^{-1}\in
+    \mathbb{F}(10,2,\lambda,\omega)$.
+    Verificare se la proprietà associativa
+    $(a\tilde+b)\tilde+c=a\tilde+(b\tilde+c)$ è valida.
+    \begin{equation*}
+        \begin{aligned}
+            (0.11\tilde+0.013)\tilde+0.014&=0.11\tilde+(0.013\tilde+0.014) \\ 
+            fl(0.123)\tilde+0.014&=0.11\tilde+fl(0.027)\\ 
+            0.12\tilde+0.014&=0.11\tilde+0.03 \\ 
+            fl(0.134)&=0.14 \\
+            0.13\times10^0&\neq0.14\times10^0
+        \end{aligned} 
+    \end{equation*}
+    Concludendo, la proprietà associativa non è valida nell'ambito dell'aritmetica finita.
+\end{example}
+Questo significa che la stessa istruzione o espressione, se scritta in modi
+diversi, può produrre risultati differenti. 
+Di conseguenza, è importante comprendere come evitare di scrivere operazioni che
+potrebbero causare errori più grandi.
+\subsubsection{Caratterizzazione di $u$}
+L'unità di arrotondamento $u$ ha un'importanza numerica sia in relazione alla precisione
+di rappresentazione (Teorema) che in termini di precisione di calcolo (risultato precedente).
+La sua importanza numerica è ulteriormente sottolineata dalla seguente
+caratterizzazione:
+
+\begin{center}
+    \emph{$u$ è il più piccolo numero finito positivo tale che, se sommato a
+    1, viene ``sentito'' e risulta essere $>$ di 1.}
+\end{center}
+$$u\tilde+1>1$$
+Questo implica che per ogni numero finito $v<u$ sarà $v\tilde+1=1$.
+
+Infatti, se sommiamo un numero $v$ a $1$:
+    $$
+    \underbrace{1.0 \ldots 0}_{t \text{ cifre}} + \underbrace{0.0 \ldots 0}_{t
+    \text{ cifre}}1
+    $$
+Tuttavia, il valore $1$ rimane fuori dalle $t$ cifre e nella somma viene
+arrotondato, e non viene ``sentito'' poiché il risultato sarà comunque $1$.
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->] (-2,0) -- (2*5,0) node[right] {R};
+        \draw (0,0.1) -- (0,-0.1) node[below] {0};
+        \draw[blue] (1,0) -- (1,-0.4) node[below] {$u\tilde+1>1$};
+        \draw[red] (1,0) -- (1,0.4) node[above] {$v\tilde+1$=1};
+        \draw[blue] (1,-0.4) -- (2*3.5,-0.4);
+        \draw[red] (1,0.4) -- (0,0.4);
+        \draw[dashed, blue] (2*3.5,-0.4) -- (2*4,-0.4);
+        \filldraw (0,0) circle (0.05);
+
+        \foreach \x in {0.25, 0.3125, 0.375, 0.4375, 0.625, 0.75, 0.875, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5} {
+            \draw (2*\x,-0.1) -- (2*\x,0.1);
+        }
+    \end{tikzpicture}
+\end{center}
+Invece, se sommiamo un numero $u$ a 1:
+\begin{equation*}
+   \begin{aligned}
+       u\tilde+1&=\frac{1}{2}\beta^{1-t}+1 \\ 
+                &=\frac{\beta}{2}\beta^{-t}+1 \\
+                &=0.0\ldots0\frac{\beta}{2}+\underbrace{1.0\ldots0}_{t\text{
+                cifre}} \\ 
+                &= 1.0\ldots0 \frac{\beta}{2}+0.0+0.0\ldots0 \frac{\beta}{2}
+                \text{ per arrotondamento}\\
+                &= \underbrace{1.0\ldots1}_{t\text{ cifre}}0 \text{ per
+                troncamento}\\
+                1.0\ldots1&>1
+   \end{aligned} 
+\end{equation*}
+Nello standard IEEE-754, se consideriamo l'arrotondamento ai pari e dato che
+$1.0\ldots0 \frac{\beta}{2}=\frac{x+y}{2}$, dove $x=1$ e
+$y=1.0\ldots1$, il valore pari più vicino è 1. Pertanto, 1 verrà scelto come
+risultato dell'arrotondamento. Questo cambia la caratterizzazione di $u$:
+\begin{center}
+    \emph{$u$ è il più grande numero finito positivo tale che, se sommato a 1,
+    risulta essere $=1$}.
+\end{center}
+$$u\tilde+1=1$$
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->] (-2,0) -- (2*5,0) node[right] {R};
+        \draw (0,0.1) -- (0,-0.1) node[below] {0};
+        \draw[red] (1,0) -- (1,-0.4) node[below] {$v\tilde+1>1$};
+        \draw[blue] (1,0) -- (1,0.4) node[above] {$u\tilde+1$=1};
+        \draw[red] (1,-0.4) -- (2*3.5,-0.4);
+        \draw[blue] (1,0.4) -- (0,0.4);
+        \draw[dashed, red] (2*3.5,-0.4) -- (2*4,-0.4);
+        \filldraw (0,0) circle (0.05);
+
+        \foreach \x in {0.25, 0.3125, 0.375, 0.4375, 0.625, 0.75, 0.875, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5} {
+            \draw (2*\x,-0.1) -- (2*\x,0.1);
+        }
+    \end{tikzpicture}
+\end{center}
+Ma cosa ci serve tutto a questo? Per determinare proceduralmente $u$:
+\begin{enumerate}
+    \item Esaminare le potenze negative di 2.
+    \item Continuare finché non si individua una potenza $2^{-t}$ che, quando sommata a 1,
+        produce come risultato esattamente 1.
+    \item Tale potenza $2^{-t}$ rappresenta l'unità di arrotondamento $u$.
+\end{enumerate}
+\begin{verbatim}
+    u=1
+    t=0
+    while (u+1>1)
+        u=u/2
+        t=t+1
+    end 
+    stampa(u,t)
+\end{verbatim}
 \end{document}
