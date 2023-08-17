@@ -22,6 +22,7 @@
 \newtheorem*{theorem}{\color{green}\textbf{Teorema}}
 \newtheorem*{corollary}{\color{violet}\textbf{Corollario}}
 \newtheorem*{oss}{Osservazione}
+\numberwithin{equation}{section}
 
 \newenvironment{example}
 {\begin{center}
@@ -80,7 +81,7 @@ memoria limitata, non sono in grado di rappresentare.
             \alpha&=\pm(\sum_{i=1}^{\infty}\alpha_i\beta^{-i})\beta^p
         \end{aligned}
     \end{equation}
-    I vari termini della formula \ref{eq:1} vengono detti:
+    I vari termini della \ref{eq:1} vengono detti:
     $$\begin{array}{lll}
         \beta & & \text{base} \\ 
         p & & \text{esponente} \\ 
@@ -961,7 +962,7 @@ Iniziamo dividendo l'errore totale in due componenti:
     \begin{equation} \label{eq:2}
         E_{tot}=E_{alg}(1+E_{in})+E_{in}
     \end{equation}
-    Trascurando il prodotto di errori, la formula \ref{eq:2} risulta così semplificata:
+    Trascurando il prodotto di errori, la \ref{eq:2} risulta così semplificata:
     {\color{green}$$E_{tot}\approx E_{alg}+E_{in}$$}
 \end{theorem}
 
@@ -1048,7 +1049,8 @@ Se, invece, l'errore algoritmico è minimo, l'algoritmo è definito come numeric
     l'errore.
 \end{example}
 
-\subsubsection{Numero di condizione}     
+\subsubsection{Numero di condizione}
+\paragraph{Funzioni $f:\mathbb{R}\rightarrow \mathbb{R}$.}
 Consideriamo una funzione $f:\mathbb{R}\rightarrow \mathbb{R}$ che sia
 \underline{differenziabile}. Supponendo che vogliamo valutare questa funzione in un
 punto vicino a $x_0$, possiamo usare lo sviluppo di Taylor centrato in
@@ -1084,7 +1086,7 @@ Calcoliamo l'errore inerente:
 \end{equation*}
 
 Ciò che emerge è che l'errore inerente non dipende soltanto dall'errore sui
-dati, ma anche da una quantità $\Big\lvert \frac{f'(x_0)x_0}{f(x_0}\Big\rvert$ che amplifica tale errore.
+dati, ma anche da una quantità $\Big\lvert \frac{f'(x_0)x_0}{f(x_0)}\Big\rvert$ che amplifica tale errore.
 Questa quantità è nota come \textbf{numero di condizione} e lo denotiamo con
 $C(f, x_0)$. 
 
@@ -1094,6 +1096,64 @@ soluzione.
 
 Pertanto, per determinare se un problema differenziabile è mal condizionato in
 un dato punto, si può guardare il suo numero di condizione.
+
+\paragraph{Generalizzazione per funzioni $f:\mathbb{R}^n\rightarrow
+\mathbb{R}$.} Dati una funzione $f:\mathbb{R}^n\rightarrow \mathbb{R}$ e due
+vettori $x=(x_1,x_2,\ldots,x_n)$ e 
+$\tilde{x}=(\tilde{x}_1,\tilde{x}_2,\ldots,\tilde{x}_n)$. 
+
+L'espansione di
+Taylor di funzione in più variabili può essere espressa come:
+$$f(\tilde{x})=f(x)+\displaystyle\sum_{i=1}^{n}(\tilde{x}_i-x_i)\frac{\delta
+f}{\delta x_i}+o(h)$$
+dove $\frac{\delta f}{\delta x_i}$ rappresenta la derivata parziale di $f$
+rispetto alla $i$-esima componente e
+$h=\displaystyle\sum_{i=1}^{n}(\tilde{x}_i-x_i)$.
+
+Calcoliamo l'errore inerente:
+\begin{equation*}
+   \begin{aligned}
+       E_{in}&=\left\lvert \frac{f(\tilde{x})-f(x)}{f(x)}\right\rvert\\
+       \alignedintertext{Sostituendo lo sviluppo di Taylor per $f(\tilde{x})$,
+       possiamo riscrivere:}
+             &\approx \left\lvert
+                 \frac{\cancel{f(x)}+\displaystyle\sum_{i=1}^{n}(\tilde{x}_i-x_i)\frac{\delta
+             f}{\delta x_i}-\cancel{f(x)}}{f(x)}\right\rvert \\ 
+             &\leq \displaystyle\sum_{i=1}^{n}\left\lvert
+             \frac{(\tilde{x}_i-x_i)\frac{\delta f}{\delta
+x_i}}{f(x)}\right\rvert & \text{per ipotesi } x_i\neq 0\\ 
+&= \displaystyle\sum_{i=1}^{n}\left\lvert \frac{(\tilde{x}_i-x_i)\frac{\delta
+f}{\delta x_i}}{f(x)}\frac{x_i}{x_i}\right\rvert\\
+\alignedintertext{Se si considera $\epsilon_i=\frac{\tilde{x}_i-x_i}{x_i}$
+    come gli errori
+sui dati e le quantità $c_i=\frac{\frac{\delta f}{\delta x_i}x_i}{f(x)}$ i numeri
+di condizione, possiamo riscrivere:}
+&= \displaystyle\sum_{i=1}^{n}\left\lvert c_i\epsilon_i\right\rvert
+   \end{aligned} 
+\end{equation*}
+
+Ricapitolando:
+\begin{equation}
+    \begin{aligned}
+        \left\lvert \frac{f(\tilde{x})-f(x)}{f(x)}\right\rvert&\leq
+        \displaystyle\sum_{i=1}^{n} \left\lvert c_i\epsilon_i\right\rvert
+    \end{aligned}
+    \label{eq:numero_condizione_1}
+\end{equation}
+dove 
+\begin{equation}
+    \begin{aligned}
+        c_i&=\frac{\frac{\delta f}{\delta x_i}x_i}{f(x)} 
+    \end{aligned} 
+    \label{eq:numero_condizione_2}
+\end{equation}
+
+Se anche uno solo di questi numeri di condizione è grande, l'errore inerente
+sarà significativo. Per avere un errore inerente piccolo, è necessario che
+tutti i numeri di condizione siano piccoli.
+
+Inoltre, grazie a quanto abbiamo visto, se la funzione è differenziabile,
+saremo in grado di stimare l'errore inerente più velocemente.
 
 \begin{example}
     Consideriamo la funzione $f:\mathbb{R}\rightarrow \mathbb{R}$ definita
@@ -1121,12 +1181,12 @@ condizionato in prossimità di $x=1$.
         ]
         \addplot[blue, thick] {sqrt(1-x)};
         \addplot[red, mark=*, only marks] coordinates {(0.9,0.316)};
-        \node[red, anchor=north] at (axis cs:0.9,0.316) {$f(x)$};
+        \node[red, anchor=north east] at (axis cs:0.9,0.316) {$f(x)$};
         \draw[red, dashed] (axis cs:0.9,0) -- (axis cs:0.9,0.316);
         \draw[red, dashed] (axis cs:0,0.316) -- (axis cs:0.9,0.316);
     
-        \addplot[red, mark=*, only marks] coordinates {(0.92,0.283)};
-        \node[red, anchor=north] at (axis cs:0.88,0.346) {$f(\tilde{x})$};
+        \addplot[red, mark=*, only marks] coordinates {(0.88,0.346)};
+        \node[red, anchor=south east] at (axis cs:0.88,0.346) {$f(\tilde{x})$};
         \draw[red, dashed] (axis cs:0.88,0) -- (axis cs:0.88,0.346);
         \draw[red, dashed] (axis cs:0,0.346) -- (axis cs:0.88,0.346);
         \end{axis}
@@ -1158,11 +1218,147 @@ $$E_{in}=\left\lvert
 \frac{f(\tilde{x}_0)-f(x_0)}{f(x_0)}\right\rvert=\left\lvert
 \frac{0.014142-0.0126491}{0.0126491}\right\rvert\approx 0.1180$$
 
-Ora, calcoliamo il numero di condizione in $x_0$:
+Il numero di condizione in $x_0$ è:
 $$C(f, x_0) = C(\sqrt{1-x}, 0.99984) =
 \left\lvert\frac{0.99984}{2(1-0.99984)}\right\rvert \approx 0.312 \times 10^4$$
-\end{example}
 
+Osserviamo che l'errore sui dati si amplifica di 4 ordini di grandezza, a causa
+del numero di condizione, causando un grave errore sul risultato.
+\end{example}
+\begin{example}
+    Si stimi l'errore inerente applicando \ref{eq:numero_condizione_1} nei casi già visti
+   di moltiplicazione e addizione fra numeri reali:
+   \begin{itemize}
+       \item \textbf{moltiplicazione} $f(x_1,x_2)=x_1\cdot x_2$; applicando
+           la \ref{eq:numero_condizione_2} si ha
+           \begin{equation*}
+                \begin{aligned}
+                    & c_1=\frac{x_1}{x_1x_2}=1 & c_2=\frac{x_2}{x_1x_2}x_1=1
+                \end{aligned} 
+           \end{equation*}
+           da cui si deduce che il problema in oggetto è ben condizionato e
+           risulta 
+           $$E_{in}=\left\lvert
+           \frac{f(\tilde{x})-f(x)}{f(x)}\right\rvert\leq
+           \displaystyle\sum_{i=1}^{2}\left\lvert
+           c_i\epsilon_i\right\rvert=\left\lvert
+           c_1\epsilon_1\right\rvert+\left\lvert
+           c_2\epsilon_2\right\rvert=1 \left\lvert \epsilon_1\right\rvert+1
+           \left\lvert \epsilon_2\right\rvert$$
+       \item \textbf{addizione} $f(x_1,x_2)=x_1+x_2$; applicando la
+           \ref{eq:numero_condizione_2} si ha
+           \begin{equation*}
+                \begin{aligned}
+                    & c_1=\frac{x_1}{x_1+x_2}1 & c_2=\frac{x_2}{x_1+x_2}1
+                \end{aligned} 
+           \end{equation*}
+           da cui si deduce che il problema è mal condizionato per
+           $x_1+x_2\rightarrow0$ e risulta 
+           $$E_{in}=\ldots=\left\lvert \frac{x_1}{x_1+x_2}\right\rvert
+           \left\lvert \epsilon_1\right\rvert+ \left\lvert
+           \frac{x_2}{x_1+x_2}\right\rvert \left\lvert \epsilon_2\right\rvert$$
+   \end{itemize}
+\end{example}
+\paragraph{Errore analitico.} Supponiamo di avere una funzione
+$g:\mathbb{R}\rightarrow \mathbb{R}$ o $g:\mathbb{R}^n\rightarrow \mathbb{R}$
+che \underline{non} può essere risolta in aritmetica reale. Un esempio tipico potrebbe essere
+una funziona che calcola il seno di un numero, per la quale un calcolatore
+potrebbe non avere una definizione diretta.
+
+Per trattare questo problema computazionalmente, possiamo sostituire 
+$g(x)$ con una sua approssimazione $f(x)$ che, al contrario, è direttamente
+calcolabile. Un modo comune per approssimare questa funzione è utilizzare lo
+sviluppo di Taylor.
+
+L'errore introdotto nell'usare $f(x)$ al posto di $g(x)$ è ciò che chiamiamo
+\textbf{errore analitico} ed è definito come:
+$$E_{an}=\left\lvert \frac{f(x)-g(x)}{g(x)}\right\rvert$$
+
+L'errore analitico si verifica quando si approssima un problema
+\emph{irrazionale} (cioè, un problema non risolvibile in aritmetica reale)
+con un problema \emph{razionale} o direttamente calcolabile.
+\begin{example}
+    Si esamina il problema della valutazione della seguente funzione:
+    \begin{equation*}
+        \begin{aligned}
+            & f(x_1,x_2)=\sqrt{x_1+x_2}-\sqrt{x_1} & \text{con }x_1
+            ,x_1+x_2\geq 0
+        \end{aligned}
+    \end{equation*}
+
+    Esistono delle condizioni dei dati in ingresso che possono causare errori
+    gravi e che possono invalidare il risultato?
+
+    \begin{enumerate}
+        \item Se $x_2$ è estremamente piccolo in confronto a $x_1$, si
+            incorre in un errore di cancellazione numerica.
+        \item Se $x_1$ e $x_2$ sono di segno opposto e con valori quasi
+            uguali, si incorre in un errore di cancellazione numerica.
+    \end{enumerate}
+
+    Alla luce di ciò, si  cerca un algoritmo differente che eviti il problema. 
+    Razionalizzando, otteniamo: 
+    \begin{equation*}
+       \begin{aligned}
+            f(x_1,x_2)&=(\sqrt{x_1+x_2}-\sqrt{x_1})\frac{\sqrt{x_1+x_2}+\sqrt{x_1}}{\sqrt{x_1+x_2}+\sqrt{x_1}}
+            \\ 
+                      &= \frac{x_2}{\sqrt{x_1+x_2}+\sqrt{x_1}}
+       \end{aligned} 
+    \end{equation*}
+
+    Ora, a denominatore si effettua un addizione fra quantità non negative. 
+    Questo elimina il rischio di cancellazione per la $1^{\circ}$ condizione,
+    ma non per la $2^{\circ}$ condizione. 
+
+    Per convincerci di ciò, analizziamo l'errore inerente. 
+    Utilizziamo la stima \ref{eq:numero_condizione_1}: 
+    nel caso specifico sarà $E_{in}=c_1\epsilon_1+c_2\epsilon_2$ con $c_1$ e $c_2$
+    calcolati tramite la \ref{eq:numero_condizione_2}; facendo i conti si
+    ottiene:
+    \begin{equation*}
+       \begin{aligned}
+           & c_1=-\frac{1}{2}\sqrt{\frac{x_1}{x_1+x_2}} &
+           c_2=\frac{1}{2}(1+\sqrt{\frac{x_1}{x_1+x_2}})=\frac{1}{2}-c_1
+       \end{aligned} 
+    \end{equation*}
+    e il problema risulta mal condizionato proprio quando $x_1+x_2\rightarrow
+    0$.
+
+    Illustriamo la situazione con un esempio numerico, dove con $f$ denotiamo
+    il valore esatto, mentre con $\tilde{f}$ e $\hat{f}$, rispettivamente i
+    risultati dei due algoritmi lavorando in
+    $\mathbb{F}(10,7,\lambda,\omega)$.
+    \begin{itemize}
+        \item Siano dati $x_1=0.1\times10^1$ e $x_2=0.1\times10^{-3}$, allora
+            $c_2\approx1$ che indica un buon condizionamento in questo caso. I
+            risultati esatto e calcolati con i due algoritmi sono:
+            \begin{equation*}
+               \begin{aligned}
+                   f(x_1,x_2)&=0.4999875\times10^{-6}\\
+                   \tilde{f}(x_1,x_2)&=0.4994869\times10^{-6}\\
+                   \hat{f}(x_1,x_2)&=0.4999875\times10^{-6}
+               \end{aligned} 
+            \end{equation*}
+            che indica l'instabilità del primo algoritmo nel caso di
+            $\left\lvert x_2\right\rvert<<\left\lvert x_1\right\rvert$.
+        \item Siano dati $x_1=1$ e $x_2=-1+10^{-6}=0.999999$, allora
+            $c_2\approx0.5\times10^-3$ che indica un cattivo condizionamento,
+            infatti $x_1+x_2\rightarrow 0$. I risultati e satto e calcolati
+            con i due algoritmi sono:
+            \begin{equation*}
+               \begin{aligned}
+                   f(x_1,x_2)&=-0.999\\
+                   \tilde{f}(x_1,x_2)=\hat{f}(x_1,x_2)&=-0.9985858
+               \end{aligned} 
+            \end{equation*}
+            che mostra come entrambi gli algoritmi ci restituiscono risultati
+            scadenti.
+        \item Siano dati $x_1=0.1$ e $x_2=0.2$, allora $c_2\approx0.85$ che
+            indica un buon condizionamento anche in questo caso. I risultati esatto
+            e calcolati con i due algoritmi sono:
+            $$f(x_1,x_2)=\tilde{f}(x_1,x_2)=\hat{f}(x_1,x_2)=0.1309858$$
+    \end{itemize}
+\end{example}
 \newpage
-\section{Polinomi}
+\section{Funzioni polinomiali e interpolazione}
 \end{document}
