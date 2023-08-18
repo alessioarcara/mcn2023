@@ -56,6 +56,52 @@
   }%
 }
 
+\ExplSyntaxOn
+\NewDocumentCommand{\ruffini}{mmmm}
+ {% #1 = polynomial, #2 = divisor, #3 = middle row, #4 = result
+  \franklin_ruffini:nnnn { #1 } { #2 } { #3 } { #4 }
+ }
+
+\seq_new:N \l_franklin_temp_seq
+\tl_new:N \l_franklin_scheme_tl
+\int_new:N \l_franklin_degree_int
+
+\cs_new_protected:Npn \franklin_ruffini:nnnn #1 #2 #3 #4
+ {
+  % Start the first row
+  \tl_set:Nn \l_franklin_scheme_tl { & }
+  % Split the list of coefficients
+  \seq_set_split:Nnn \l_franklin_temp_seq { , } { #1 }
+  % Remember the number of columns
+  \int_set:Nn \l_franklin_degree_int { \seq_count:N \l_franklin_temp_seq }
+  % Fill the first row
+  \tl_put_right:Nx \l_franklin_scheme_tl
+   { \seq_use:Nn \l_franklin_temp_seq { & } }
+  % End the first row and leave two empty places in the next
+  \tl_put_right:Nn \l_franklin_scheme_tl { \\ #2 & & }
+  % Split the list of coefficients and fill the second row
+  \seq_set_split:Nnn \l_franklin_temp_seq { , } { #3 }
+  \tl_put_right:Nx \l_franklin_scheme_tl
+   { \seq_use:Nn \l_franklin_temp_seq { & } }
+  % End the second row
+  \tl_put_right:Nn \l_franklin_scheme_tl { \\ \hline }
+  % Split and fill the third row
+  \seq_set_split:Nnn \l_franklin_temp_seq { , } { #4 }
+  \tl_put_right:Nx \l_franklin_scheme_tl
+   { & \seq_use:Nn \l_franklin_temp_seq { & } }
+  % Start the array (with \use:x because the array package
+  % doesn't expand the argument)
+  \use:x
+   {
+    \exp_not:n { \begin{array} } { r | *{\int_eval:n { \l_franklin_degree_int - 1 }} { r } | r }
+   }
+  % Body of the array and finish
+  \tl_use:N \l_franklin_scheme_tl
+  \end{array}
+ }
+\ExplSyntaxOff
+
+
 
 \setlength\parindent{0pt}
 
@@ -795,8 +841,7 @@ L'immagine \ref{fig:analisi_errore} mostra che se la distanza tra $x$ e
 $x+\delta x$ è piccola e, analogamente, la distanza tra $f(x)$ e
 $\tilde{f}(x+\delta x)$ è anch'essa piccola, allora possiamo considerare il
 risultato come ``buono''.
-\subsubsection{Analisi in avanti degli errori nelle operazioni di
-moltiplicazione e addizione}
+\subsubsection{Analisi in avanti degli errori nelle operazioni di moltiplicazione e addizione}
 Applicando l'analisi in avanti alle operazioni di moltiplicazione e addizione
 si ottengono alcuni importanti risultati:
 \begin{itemize}
@@ -948,8 +993,9 @@ Iniziamo dividendo l'errore totale in due componenti:
         problema. È il contributo dell'algoritmo nell'amplificare gli errori
         presenti nei dati. Possiamo chiamarlo \textbf{errore algoritmico}. Per
         valutarlo, confrontiamo il risultato finale ottenuto utilizzando
-        l'algoritmo con il dato approssimato con il risultato teorico che
-        l'algoritmo dovrebbe restituire.
+        l'algoritmo in aritmetica finita con il risultato teorico che
+        l'algoritmo avrebbero fornito operando in aritmetica esatta,
+        considerando che dati iniziali siano già stati approssimati.
         $$E_{alg}=\Big\lvert
         \frac{\tilde{f}(\tilde{x})-f(\tilde{x})}{f(\tilde{x})} \Big\rvert$$
 \end{itemize}
@@ -1361,4 +1407,253 @@ con un problema \emph{razionale} o direttamente calcolabile.
 \end{example}
 \newpage
 \section{Funzioni polinomiali e interpolazione}
+\begin{definition}
+    Una funzione $p:\mathbb{R}\rightarrow \mathbb{R}$ definita da 
+    \begin{equation} \label{eq:teorema_fondamentale_algebra}
+       \begin{aligned}
+           &
+           p(x)=a_0+a_1x+a_2x^2+\ldots+a_nx^n=\displaystyle\sum_{i=0}^{n}a_ix^i
+       \end{aligned} 
+    \end{equation}
+    è detta funzione polinomiale, dove $n$ è un intero non negativo detto 
+    grado e $a_0,a_1,\ldots,a_n$ sono numeri reali fissati detti
+    {coefficienti}. Inoltre,
+    \begin{itemize}
+        \item se $a_n\neq 0$, si dice che p(x) ha grado $n$; 
+        \item se tutti i coefficienti $a_i$, sono nulli, 
+            allora p(x) è detto polinomio nullo.
+    \end{itemize}
+\end{definition}
+Con $\text{\textbf{P}}_n$ si denota l'insieme di tutte le funzioni polinomiali
+con grado $\leq n$, insieme al polinomio nullo. $\text{\textbf{P}}_n$ è uno
+spazio vettoriale di dimensione $n+1$. In uno spazio vettoriale di dimensione
+$n+1$, è necessario identificare $n+1$ funzioni polinomiali linearmente
+indipendenti per rappresentare univocamente tutte le altri funzioni all'interno 
+di tale spazio come combinazione lineare di queste $n+1$ funzioni base.
+
+È importante sottolineare che esistono infinite possibili basi per uno spazio
+vettoriale come $\text{\textbf{P}}_n$.
+
+Nel contesto del calcolo numerico, la scelta della base è fondamentale. Basi
+diverse corrispondono a coefficienti diversi, che possono influenzare l'errore
+inerente durante i calcoli.
+\begin{oss}
+    Un polinomio è una funzione razionale, direttamente calcolabile su un
+    calcolatore.
+\end{oss}
+\begin{theorem}[fondamentale dell'algebra]
+    Sia $p(x)$ un polinomio di grado $n  \geq$ 1. Allora, $p(x)$ ha 
+    esattamente $n$ radici reali o complesse, contate con la sua
+    molteplicità. Ciò significa che $p(x)=0$ può essere riscritto come:
+    \begin{equation}
+        \begin{aligned} \label{eq:teorema_divisione_polinomi}
+           p(x)=a_n(x-\alpha_1)^{m_1}(x-\alpha_2)^{m_2}\ldots(x-\alpha_k)^{m_k}
+       \end{aligned} 
+    \end{equation}
+    dove:
+    \begin{itemize}
+        \item $\alpha_i$ (per $i=1,\ldots,k$) sono le radici distinte del polinomio,
+       \item $m_i$ (per $i=1,\ldots,k$) rappresenta la molteplicità della radice
+       $\alpha_i$,
+       \item e la somma totale delle molteplicità è $m_1+m_2+\ldots+m_k=n$.
+    \end{itemize}
+\end{theorem}
+Il teorema fondamentale dell'algebra ci fornisce un altro modo per esprimere
+il polinomio.
+\begin{theorem}
+    Siano $a(x)$ e $b(x)$ polinomi (dove $b(x)$ non è il polinomio nullo); 
+    allora è sempre possibile dividere $a(x)$ per $b(x)$ in modo da ottenere
+    un quoziente $q(x)$ ed un resto $r(x)$. In altre parole, ogni polinomio
+    $a(x)$ può essere espresso nella forma: 
+    $$a(x)=q(x)b(x)+r(x)$$
+    con $r(x)=0$ o $r(x)$ con grado minore di quello di $b(x)$.
+\end{theorem}
+\subsection{Valutazione di un polinomio}
+Il primo problema che affronteremo riguarda la valutazione di un polinomio.
+Ciò significa determinare il valore del polinomio per un assegnato valore $\bar{x}$.
+
+Formalmente, data la funzione:
+$$f(a_0,a_1,\ldots,a_n,\bar{x})=a_0+a_1\hat{x}+\ldots+a_n\bar{x}^n$$
+dove $f:\mathbb{R}^{n+2}\rightarrow \mathbb{R}$, vogliamo trovare il risultato
+di:
+$$p(\bar{x})=f(a_0,a_1,\ldots,a_n\bar{x})$$
+In altre parole, inserendo i dati $a_0,a_1,\ldots,a_n$ e un valore specifico
+$\bar{x}$, vogliamo calcolare il valore del polinomio per quel valore.
+
+Considerando una funzione polinomiale di grado $n$ nella sua rappresentazione
+canonica \ref{eq:teorema_fondamentale_algebra}, il metodo più immediato per la sua valutazione in corrispondenza di un
+assegnato valore $\bar{x}$ può essere come segue:
+\begin{verbatim}
+   p=a[0]
+   s=1
+   for k=1..n
+       s=s*x_bar
+       p=p+a[k]*s
+\end{verbatim}
+Il calcolo di $p(\bar{x})$ richiede $2n$ moltiplicazioni ed $n$ addizioni, con
+un costo asintotico $\mathcal{O}(n)$. Possiamo fare meglio?
+
+Se si scrive il polinomio \ref{eq:teorema_fondamentale_algebra} nella seguente
+forma:
+\begin{equation}
+   \begin{aligned}
+       p(x)&=a_0+x(a_1+a_2x+\ldots+a_{n-1}x^{n-2}+a_nx_{n-1}) \\
+           &=a_0+x(a_1+x(a_2+a_3x+\ldots+a_{n-1}x^{n-3}+a_nx^{n-2}))\\ 
+           &\vdots \\ 
+           &=a_0+x(a_1+x(a_2+\ldots+x(a_{n-1}+xa_n)\cdots))
+   \end{aligned} 
+\end{equation}
+si ricava un differente metodo dovuto ad Horner: 
+\begin{verbatim}
+    p=a[n]
+    for k=n-1..0
+        p=a[k]+x_bar*p
+\end{verbatim}
+L'algoritmo di Horner richiede $n$ moltiplicazioni ed $n$ addizioni, con un
+costo asintotico $\mathcal{O}(n)$. Ancora, possiamo fare meglio?
+
+Richiamando il teorema \ref{eq:teorema_divisione_polinomi} sulla divisione di
+due polinomi, nel caso particolare in cui il polinomio divisore sia il
+binomio $(x-\bar{x})$ per un assegnato valore reale $\bar{x}$, si ha che
+esistono unici i polinomi $q(x)$ ed $r(x)$ per cui 
+$$p(x)=q(x)(x-\bar{x})+r(x)$$
+e poiché $r(x)$ deve essere di grado inferiore a quello di $(x-\bar{x})$ sarà
+una costante che indicheremo con $r$.
+\begin{theorem}
+    Il resto della divisione del polinomio $p(x)$ per $(x-\bar{x})$ è $p(\bar{x})$.
+\end{theorem}
+Dal teorema appena enunciato si deduce che un metodo per valutare un polinomio
+$p(x)$ in un punto $\bar{x}$ consiste nel determinare il resto della divisione
+fra $p(x)$ e il binomio $(x-\bar{x})$. A tal fine è ben nota la regola di
+Ruffini, la quale viene applicata seguendo il seguente schema di calcolo:
+$$\ruffini{a_n,a_{nb-1},\ldots,\ldots,a_2,a_1,a_0}{\color{red}\bar{x}}{{\color{violet}\bar{x}b_n},\bar{x}b_{n-1},\ldots,\bar{x}b_3,\bar{x}b_2,\bar{x}b_1}{{\color{blue}b_n},
+b_{n-1},\ldots,\ldots,b_2,b_1,r=p(x)}$$
+\begin{itemize}
+    \item \textbf{Preparazione}:
+    \begin{itemize}
+        \item Scrivi i coefficienti del polinomio $p(x)$ in ordine decrescente di
+            grado sulla prima riga. Se manca un termine di un certo grado,
+            includi un coefficiente 0 per quel grado.
+        \item Senza effettuare alcuna operazione, porta giù il primo coefficiente.
+    \end{itemize}
+    \item \textbf{Procedimento}:
+    \begin{itemize}
+        \item Procedi con la compilazione della seconda riga e della terza riga.
+            Moltiplica {\color{blue} l'elemento} appena riportato nella terza riga per il
+            {\color{red} valore assegnato $\bar{x}$}. Scrivi il {\color{violet}risultato} 
+            nella seconda riga, nella colonna successiva. 
+        \item Somma il coefficiente della prima riga con l'
+            {\color{violet}elemento} presente nella seconda riga della colonna
+            corrispondente e riporta il risultato nella terza riga della stessa
+            colonna.
+    \end{itemize}
+\end{itemize}
+Reiterando il procedimento arriviamo all'ultimo elemento a destra sulla terza riga, 
+che rappresenta il resto.
+
+Le operazioni fatte sono:
+\begin{equation*}
+   \begin{aligned}
+    b_n & = a_n \\
+    b_{n-1} & = a_{n-1}+\bar{x}b_n \\
+    b_{n-2} & = a_{n-2}+\bar{x}b_{n-1} \\
+    & \vdots \\
+    r & = a_0+\bar{x}b_1
+   \end{aligned} 
+\end{equation*}
+Come si può osservare, questo schema si traduce esattamente nello pseudocodice
+di Horner. Tuttavia, mentre Horner serve solamente a valutare il polinomio,
+Ruffini può essere anche utilizzato anche per valutare la derivata del polinomio.
+\subsubsection{Valutazione numerica della derivata}
+Se siamo interessati solo al valore della derivata in $\bar{x}$, allora, 
+in modo più economico si può procedere nel seguente modo: 
+per quanto detto nella sezione precedente, possiamo riscrivere
+$p(x)$ come
+$$p(x)=q(x)(x-\bar{x})+p(\bar{x})$$
+derivando tale espressione si ha 
+$$p'(x)=q'(x)(x-\bar{x})+q(x)$$
+e valutandola in $\bar{x}$
+\begin{equation*}
+    \begin{aligned}
+        p'(\bar{x})&=q'(\bar{x})\underbrace{(\bar{x}-\bar{x})}_{0}+q(\bar{x})\\ 
+                   &=q(\bar{x})
+    \end{aligned} 
+\end{equation*}
+dove $q(x)$ ed i suoi coefficienti sono quelli che si ottengono applicando
+l'algoritmo di Ruffini per valutare $p(x)$ in $\bar{x}$.
+\begin{verbatim}
+    p=a[n]
+    p1=0
+    for k=n-1..0
+        p1=p+x_bar*p1
+        p=a[k]+x_bar*p
+\end{verbatim}
+analogamente si possono calcolare anche le derivate di ordine superiore.
+Derivando l'espressione ottenuta per $p'(x)$ si ottiene:
+$$p''(x)=q''(x)(x-\bar{x})+2q'(x)$$
+e valutando questa espressione in $\bar{x}$
+\begin{equation*}
+   \begin{aligned}
+       p''(\bar{\bar{x}})&=q''(\bar{x})\underbrace{(\bar{x}-\bar{x})}_0+2q'(\bar{x})\\
+       &=2q'(\bar{x})
+   \end{aligned} 
+\end{equation*}
+Allora per ottenere $p''(\bar{x})$ è sufficiente calcolare $q'(\bar{x})$ che
+possiamo ottenere da Ruffini utilizzato per valutare $p'(x)$ in $\bar{x}$.
+\begin{example}
+    Dato il polinomio $p(x)=1+x-2x^2+3x^4$, vogliamo calcolare $p(2)$, $p'(2)$
+    e $p''(2)$.
+    Per fare ciò, possiamo utilizzare la regola di Ruffini:
+    $$\ruffini{3,0,-2,1,1}{2}{6,12,20,42}{3,6,10,21,43=p(2)}$$
+    $$\ruffini{3,6,10,21}{2}{6,24,68}{3,12,34,89=p'(2)}$$
+    $$\ruffini{3,12,34}{2}{6,36}{3,18,70\rightarrow 2*70=140=p''(2)}$$
+\end{example}
+\paragraph{Stima dell'errore algoritmico del metodo di Horner/Ruffini.}
+Procediamo con un'analisi in avanti per determinare l'errore algoritmico
+associato al metodo di Horner/Ruffini. Questo metodo è utilizzato per
+calcolare il valore di un polinomio di grado $n$ nella base canonica 
+in un punto $\bar{x}$, rappresentato come $f(a_1,a_2,\ldots,a_n,x)=p(x)$, 
+dove $f:\mathbb{R}^2\rightarrow \mathbb{R}$. 
+Si ottiene:
+\begin{equation*}
+   \begin{aligned}
+       E_{alg}=\left\lvert
+       \frac{\tilde{f}(\tilde{a}_0,\tilde{a}_1,\ldots,\tilde{a}_n,\tilde{x})-f(\tilde{a}_0,\tilde{a_1},\ldots,\tilde{a}_n,\tilde{x})}{f(\tilde{a}_0,\tilde{a}_1,
+   \ldots,\tilde{a}_n,\tilde{x})}\right\rvert\leq \frac{\gamma2n}{\left\lvert
+p(\tilde{x})\right\rvert}\displaystyle\sum_{i=0}^{n}\left\lvert a_i\tilde{x}^i\right\rvert
+   \end{aligned}
+\end{equation*}
+con 
+$$\gamma2n\leq2.01nu$$
+Se ci limitassimo a considerare soltanto quest'ultimo, potremmo considerare
+l'algoritmo come stabile, dato che cresce linearmente con il grado del polinomio. 
+Però, se i coefficienti o i valori di $x$ fossero particolarmente grandi, ciò
+potrebbe causare un incremento significativo nell'errore algoritmico.
+\paragraph{Stima dell'errore inerente del metodo di Horner/Ruffini.}
+Generalizzando l'analisi fatta in questo esempio alla valutazione di un
+generico polinomio $p(x)$ nella base canonica l'errore inerente si può
+rappresentare come la somma di due componenti:
+\begin{equation*}
+    \begin{aligned}
+        E_{in} &\leq 
+        {\color{blue}\left\lvert \frac{a_0}{p(x)}\epsilon_0\right\rvert} + 
+        {\color{blue}\left\lvert \frac{a_1x}{p(x)}\epsilon_1\right\rvert} + 
+        {\color{blue}\left\lvert \frac{a_2x^2}{p(x)}\epsilon_2\right\rvert} + \ldots + 
+        {\color{blue}\left\lvert \frac{a_nx^n}{p(x)}\epsilon_n\right\rvert} + 
+        {\color{red}\left\lvert \frac{xp'(x)}{p(x)}\epsilon_x \right\rvert}\\
+        &={\color{blue}E_{in1}}+{\color{red}E_{in2}}
+    \end{aligned}
+\end{equation*}
+Si può desumere che:
+\begin{itemize}
+    \item $E_{in1}$ dipende da $p(x)$ e dai valori $a_ix^i$. Questi termini dipendono
+   dalla base di rappresentazione;
+   \item $E_{in2}$ dipende dal valore di $x$, dal polinomio in esame $p(x)$ e
+       dalla sua derivata, per cui è un errore che non dipende dalla
+       base di rappresentazione.
+\end{itemize}
+Nel seguito vogliamo esaminare se è possibile agire sull'espressione $p(x)$ al
+fine di ridurre l'errore inerente. Si introduce il concetto di
+\textbf{condizionamento di una base polinomiale} per indicare quale
+rappresentazione polinomiale
 \end{document}

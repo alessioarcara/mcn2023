@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1692274983 "mnc.tex" "mnc.pdf" "mnc" 1692274984 0
+["pdflatex"] 1692394395 "mnc.tex" "mnc.pdf" "mnc" 1692394396 0
   "/Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1682419962 11524 bc6984555cd3d909220d654143e9a322 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -12,6 +12,8 @@
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm" 1246382020 940 228d6584342e91276bf566bcf9716b83 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
+  "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx5.tfm" 1136768653 1332 f817c21a1ba54560425663374f1b651a ""
+  "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm" 1136768653 1336 3125ccb448c1a09074e3aa4a9832f130 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbxti10.tfm" 1136768653 1532 9162035f4e7176612125649e348e2195 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1136768653 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm" 1136768653 1520 eccf95517727cb11801f4f1aee3a21b4 ""
@@ -185,9 +187,9 @@
   "/usr/local/texlive/2023basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1680341460 7200389 eff43fae063bd8c50cafe7d4de277f28 ""
   "/usr/local/texlive/2023basic/texmf.cnf" 1678817979 628 bde3cc671e29677eea4172140533535c ""
   "images/IEEE.png" 1691385509 16956 a163e10e738617f162f1414a5df817d1 ""
-  "mnc.aux" 1692274984 2298 d3f4fc5cc7d81598290b5e74d9dda885 "pdflatex"
-  "mnc.tex" 1692274981 63590 261a015a4acf84cad4ca557a76a7f4a5 ""
-  "mnc.toc" 1692274984 1300 deda7bce09484d441942a7a554ca612d "pdflatex"
+  "mnc.aux" 1692394396 2926 2bde2205eefac2bf58f61f45975bfe57 "pdflatex"
+  "mnc.tex" 1692394395 76836 8d73ff7b3ec81f4b7abd5ece9c3a2e96 ""
+  "mnc.toc" 1692394396 1658 0b5f9294e441490a722965bb45ed44e2 "pdflatex"
   (generated)
   "mnc.aux"
   "mnc.log"

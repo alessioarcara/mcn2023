@@ -607,6 +607,8 @@ INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/symbols/
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbxti10.tfm
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
+INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
+INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/cm/cmbx5.tfm
 INPUT mnc.aux
 INPUT /Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
