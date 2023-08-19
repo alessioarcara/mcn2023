@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1692394395 "mnc.tex" "mnc.pdf" "mnc" 1692394396 0
+["pdflatex"] 1692479083 "mnc.tex" "mnc.pdf" "mnc" 1692479084 0
   "/Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1682419962 11524 bc6984555cd3d909220d654143e9a322 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -186,10 +186,15 @@
   "/usr/local/texlive/2023basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1686556583 82330 4fa717e268ea6ef04ad47969f13a9d1c ""
   "/usr/local/texlive/2023basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1680341460 7200389 eff43fae063bd8c50cafe7d4de277f28 ""
   "/usr/local/texlive/2023basic/texmf.cnf" 1678817979 628 bde3cc671e29677eea4172140533535c ""
+  "images//bernstein_convex.jpeg" 1692478180 81358 6b8cc029983bea5e0793b5d26be5d603 ""
+  "images//bernstein_one_sum.jpeg" 1692477389 44844 fafc96359b2703f1fddf1b2ca36e40c3 ""
+  "images//bernstein_zeros.jpeg" 1692476620 41931 7194a023f35567c8c897c9734fe79e18 ""
+  "images//cambio_variabile.jpeg" 1692457006 119873 647ec1671cba72f18fd9d3acd72c471a ""
+  "images//error_amplification.png" 1692421410 27517 aea9042ac6f25d7be7cd4eca26a2ab36 ""
   "images/IEEE.png" 1691385509 16956 a163e10e738617f162f1414a5df817d1 ""
-  "mnc.aux" 1692394396 2926 2bde2205eefac2bf58f61f45975bfe57 "pdflatex"
-  "mnc.tex" 1692394395 76836 8d73ff7b3ec81f4b7abd5ece9c3a2e96 ""
-  "mnc.toc" 1692394396 1658 0b5f9294e441490a722965bb45ed44e2 "pdflatex"
+  "mnc.aux" 1692479084 3330 a7d502c642341cd762c757a5341b5454 "pdflatex"
+  "mnc.tex" 1692479083 91158 78febe6799c67c868a55a9fbbb609c32 ""
+  "mnc.toc" 1692479084 1904 f8208d039a1719812cd11660647770d4 "pdflatex"
   (generated)
   "mnc.aux"
   "mnc.log"

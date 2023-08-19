@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentczlass{article}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -101,6 +101,9 @@
  }
 \ExplSyntaxOff
 
+\makeatletter
+\def\blfootnote{\xdef\@thefnmark{}\@footnotetext}
+\makeatother
 
 
 \setlength\parindent{0pt}
@@ -1765,10 +1768,7 @@ distingue come particolarmente efficace e versatile rispetto ad altre.
             B_{i,n}(x)=\binom{n}{i}\frac{(b-x)^{n-i}(x-a)^i}{(b-a)^n}
         \end{aligned} 
     \end{equation}
-    e $b_0,b_1,\ldots,b_n\in \mathbb{R}$ sono i coefficienti nella base di
-    Bernstein.
-\end{definition}
-con $\binom{n}{i}=\frac{n!}{i!(n-i)!}$.
+\end{definition}\blfootnote{con $\binom{n}{i}=\frac{n!}{i!(n-i)!}$}
 \begin{itemize}
     \item \textbf{n=1} 
         \begin{equation*}
@@ -1939,39 +1939,6 @@ Da ora in poi useremo sempre i polinomi di Bernstein nell'intervallo $[0,1]$.
 Inoltre, i polinomi della base di Bernstein $B_{i,n}(x)$ godono delle seguenti
 proprietà:
 \begin{enumerate}
-    \item $B_{i,n}\geq0\quad i=0,\ldots,n\quad \forall x\in[0,1]$;
-        \begin{itemize}
-            \item Il valore del polinomio è sempre \underline{non negativo};
-            \item $B_{i,n}=0$ agli estremi dell'intervallo.
-                \begin{equation*}
-                   \begin{aligned}
-                       & B_{0,n}(x)=(1-x)^n &\text{tutti gli zero in 1 e
-                       nessuno zero in 0}\\
-                       & B_{1,n}(x)=\binom{n}{1}(1-x)^{n-1}x^1 & \text{uno
-                       zero in 0 ed $n$ zeri in 1}\\
-                       & \vdots \\
-                       & B_{n,n}(x)=x^n & \text{tutti gli zero in 0 e
-                       nessuno zero in 1}
-                   \end{aligned} 
-                \end{equation*}
-                \begin{center}
-                    \includegraphics[width=0.8\linewidth]{bernstein_zeros}
-                \end{center}
-        \end{itemize}
-    \item \textbf{Partizione dell'unità}:
-        per ogni $x$ nell'intervallo $[0,1]$, la somma dei valori dei
-        polinomi di Bernstein è sempre uguale a 1.
-        $$\displaystyle\sum_{i=0}^{n}B_{in}(x)=1\quad \forall x\in[0,1]$$
-        \begin{center}
-            \includegraphics[width=0.3\linewidth]{bernstein_one_sum}
-        \end{center}
-    \item Per le proprietà precedenti, $p(x)$ espresso nella base di Bernstein
-        è una combinazione convessa dei $b_i$, da cui segue
-        $$\underset{i}{\min\{b_i\}}\leq p(x)\leq \underset{i}{\max\{b_i\}}$$
-        \begin{center}
-            \includegraphics[width=0.4\linewidth]{bernstein_convex}
-        \end{center}
-        Ciò suggerisce che affinché il polinomio $p(x)$ possa avere zeri
-        reali, i coefficienti $b_i$ devono essere sia positivi che negativi.
+   \item 
 \end{enumerate}
 \end{document}
