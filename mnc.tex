@@ -10,6 +10,7 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{pgfplots}
+\usepackage{listings}
 \pgfplotsset{compat=1.9}
 \usepackage{enumitem}
 \graphicspath{ {./images/} }
@@ -101,7 +102,31 @@
  }
 \ExplSyntaxOff
 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 
 \setlength\parindent{0pt}
 
@@ -1858,7 +1883,7 @@ con $\binom{n}{i}=\frac{n!}{i!(n-i)!}$.
 \end{example}
 Considerando il problema evidenziato nell'esempio, si può fare qualcosa?
 
-\subsection{Cambio di variabile}
+\subsubsection{Cambio di variabile}
 I polinomi godono della proprietà di essere \textbf{invarianti per traslazione e scala
 dell'intervallo di definizione o cambio di variabile}. Questo significa che,
 per qualsiasi dato polinomio $p(x)$, definito in un intervallo $[a,b]$, è
@@ -1930,7 +1955,7 @@ potrebbe attenuare o "rilassare" la derivata del polinomio.
     Grazie al cambio di variabile, $c_t$ è stato ridotto a un valore che non
     amplifica l'errore.
 \end{example}
-\subsection{Proprietà dei polinomi di Bernstein}
+\subsubsection{Proprietà dei polinomi di Bernstein}
 Da ora in poi useremo sempre i polinomi di Bernstein nell'intervallo $[0,1]$.
 \begin{definition}
     Il polinomio di Bernstein definito sull'intervallo $[0,1]$ è dato da:
@@ -1973,5 +1998,186 @@ proprietà:
         \end{center}
         Ciò suggerisce che affinché il polinomio $p(x)$ possa avere zeri
         reali, i coefficienti $b_i$ devono essere sia positivi che negativi.
+    \item Valutando il polinomio in $x=0$, solo $B_{0,n}(0)$ ha valore 1,
+        mentre tutti gli altri polinomi di Bernstein sono nulli. Di
+        conseguenza, $p(0)$ corrisponde al coefficiente $b_0$. Analogamente,
+        in $x=1$, $p(1)$ coincide con $b_n$ dato che solo $B_{n,n}(1)$ è non
+        nullo e vale 1.
+        \begin{equation*}
+            \begin{aligned}
+               & p(0)=b_0 & p(1)=b_n 
+            \end{aligned}
+        \end{equation*}
 \end{enumerate}
+Ma se volessimo valutare un polinomio nella base di Bernstein in un punto interno, 
+anziché agli estremi? Poiché gli algoritmi di valutazione polinomiale che
+abbiamo visto finora sono pensati per la base canonica, è necessario
+introdurre due nuovi algoritmi specificamente pensati per la base di
+Bernstein.
+\subsubsection{Valutazione di un polinomio nella base di Bernstein}
+\paragraph{Formula ricorrente base di Bernstein.}
+I polinomi base di Bernstein di grado $n$, sono determinabili dai polinomi di
+Bernstein di grado $n-1$, dalla seguente formula ricorrente
+$$B_{i,n}(x)=xB_{i-1,n-1}(x)+(1-x)B_{i,n-1}(x)$$
+con $B_{0,0}(x)=1$ e $B_{i,n}(x)=0$ per ogni $i\notin\{0,n\}$.
+\begin{itemize}
+    \item[\textbf{Passi}:]
+    \begin{enumerate}
+        \item \textbf{Inizializzazione}: si crea un vettore $B$ di lunghezza $n+1$, 
+            inizializzato con tutti zeri tranne il primo elemento ($B_{0,0}$) che
+            sarà 1. Questo vettore conterrà i valori dei polinomi base di
+            Bernstein.
+        \item \textbf{Valutazione delle funzioni base di Bernstein}: si calcolano
+            iterativamente i valori dei polinomi base di Bernstein di grado $n$
+            usando la formula ricorrente.
+            \begin{center}
+                \includegraphics[width=0.8\linewidth]{bernstein_ricorsive}
+            \end{center}
+        \item \textbf{Calcolo di
+            $p(x)=\displaystyle\sum_{i=0}^{n}b_iB_{in}(\bar{x})$}: si esegue il prodotto
+            scalare del vettore riga $b$ e
+            il vettore colonna $B^T$ per ottenere il valore del polinomio in
+            $\bar{x}$.
+    \end{enumerate}
+\end{itemize}
+\begin{lstlisting}[language=Python]
+def bernstein_evaluation(b, x_bar):
+    n = len(b)
+    B = np.zeros((n,n))
+    B[0][0] = 1.
+
+    for i in range(1,n):
+        for j in range(0,i+1):
+            if j == 0:
+                B[i][j] = (1-x_bar) * B[i-1][j]
+            elif j == i:
+                B[i][j] = x_bar * B[i-1][j-1]
+            else:
+                B[i][j] = x_bar * B[i-1][j-1] + (1-x_bar)*B[i-1][j]
+    return sum([b[i] * B[n-1][i] for i in range(n)])
+\end{lstlisting}
+Quando si utilizza l'algoritmo per valutare un polinomio nella base di
+Bernstein:
+\begin{itemize}
+    \item Il calcolo del valore dei polinomi base $B_{i,n}(\bar{x})$ per
+        $i=0,\ldots,n$ necessita di $\frac{n(n+1)}{2}$ addizioni e
+        $n(n+1)$ moltiplicazioni.
+    \item Per ottenere il valore finale del polinomio in $\bar{x}$ attraverso
+        la combinazione lineare dei polinomi base e dei coefficienti del
+        polinomio, sono necessarie ulteriori $n$ addizioni e $n$
+        moltiplicazioni
+\end{itemize}
+In totale, l'algoritmo ha un costo computazionale di $\mathcal{O}(n^2)$. 
+Anche se questo costo potrebbe sembrare alto, va sottolineato che l'algoritmo
+è numericamente stabile, specialmente, nel calcolo dei polinomi base.
+\paragraph{Algoritmo di de Casteljau.} Un'alternativa all'algoritmo proposto è
+l'algoritmo di de Casteljau, che deriva dall'applicare ripetutamente la
+formula ricorrente all'espressione del polinomio. Vediamolo: 
+\begin{equation*}
+  \begin{aligned}
+      p(x)&=\displaystyle\sum_{i=0}^{n}b_iB_{i,n}(x)\overset{\text{def}}{=}\displaystyle\sum_{i=0}^{n}b_i(xB_{i-1,n-1}(x)+(1-x)B_{i,n-1}(x))\\
+          &=\displaystyle\sum_{i=0}^{n}b_ixB_{i-1,n-1}(x)+\displaystyle\sum_{i=0}^{n}b_i(1-x)B_{i,n-1}(x)
+          \\ 
+          \alignedintertext{A questo punto, dobbiamo notare che il termine $B_{-1,n-1}$ non
+          esiste. Inoltre, dato che la sommatoria effettivamente va solo fino
+      a $n-1$, il termine $B_{n,n-1}=0$. Dunque, regolando gli indici,
+  abbiamo:}
+          &=\displaystyle\sum_{i=0}^{n-1}b_{i+1}xB_{i,n+1}(x)+\displaystyle\sum_{i=0}^{n-1}b_i(1-x)B_{i,n-1}(x)\\
+          \alignedintertext{Raccogliendo:}
+          &=
+          \displaystyle\sum_{i=0}^{n-1}{\color{blue}\left[b_{i+1}x+b_i(1-x)\right]}B_{i,n-1}(x)\\ 
+          &=\displaystyle\sum_{i=0}^{n-1}{\color{blue}b_i^{[1]}}B_{i,n-1}(x) \\
+          \alignedintertext{Riapplicando la formula ricorrente più volte, alla
+          fine si ottiene:}
+          &=\displaystyle\sum_{i=0}^{0}b_0^{[n]}\overbrace{B_{0,0}(x)}^1=b_0^{[n]}
+  \end{aligned}  
+\end{equation*}
+Si ha quindi il seguente algoritmo:
+\begin{equation} \label{eq:de_casteljau}
+   \begin{aligned}
+       b_{i}^{[j]}=xb_{i+1}^{[j-1]}+(1-x)b_{i}^{[j-1]}
+   \end{aligned} 
+\end{equation}
+con $j=0,\ldots,n$ e $i=0,\ldots,n-j$.
+
+Si inizia con i coefficienti iniziali del polinomio e si applica
+iterativamente l'equazione \ref{eq:de_casteljau} fino a quando non si ottiene
+$b_{0}^{[n]}$. Quest'ultimo valore corrisponde al valore del polinomio quando
+viene valutato in $x$.
+\begin{center}
+    \includegraphics[width=0.58\linewidth]{bernstein_decasteljau}
+\end{center}
+\begin{lstlisting}[language=Python]
+def de_casteljau(b, x_bar):
+    if len(b) == 1:
+        return b[0]
+    
+    b_new = []
+    for i in range(len(b)-1):
+        b_new.append(x_bar * b[i+1] + (1-x_bar) * b[i])
+    
+    return de_casteljau(b_new, x_bar)
+\end{lstlisting}
+Quando si utilizza l'algoritmo di Casteljau per valutare un polinomio nella
+base di Bernstein:
+\begin{itemize}
+    \item Il calcolo del coefficiente $b_{0}^{[n]}$ necessita di $\frac{n(n+1)}{2}$
+    addizioni e $n(n+1)$
+\end{itemize}
+Il costo totale dell'algoritmo è di $\mathcal{O}(n^2)$. Tuttavia, è meno
+costoso rispetto al precedente algoritmo. Ciò è dovuto al fatto che
+l'algoritmo di Casteljau elimina la necessità di calcolare esplicitamente la
+combinazione lineare per determinare il valore di $p(x)$.
+\begin{example}
+    Si consideri il polinomio nella base di Bernstein:
+    $$p(x)=2\overbrace{B_{0,3}}^{b_0}(x)+2\overbrace{B_{2,3}}^{b_2}(x)+0\overbrace{B_a{1,3}(x)}^{b_1}+0\overbrace{B_{3,3}(x)}^{b_3}$$
+    Applicare l'algoritmo di de Casteljau ai seguenti punti: 
+    $$x=\left[0, \frac{1}{3},\frac{1}{2}, \frac{2}{3}, 1\right]$$
+    Infine, disegnare un grafico per i punti $p(x)$.
+    
+    Eseguendo l'algoritmo, otteniamo:
+    \begin{itemize}
+       \item$p(0)=2, p(1)=0$ dati dalle proprietà dei polinomi di Bernstein;
+       \item $p(\frac{1}{2})=1, p(\frac{1}{3})=\frac{28}{27},
+       p(\frac{2}{3})=\frac{26}{27}$.
+
+       \begin{center}
+           \includegraphics[width=0.9\linewidth]{de_casteljau2}
+       \end{center}
+    \end{itemize}
+
+    \begin{center}
+        \includegraphics[width=0.5\linewidth]{de_casteljau}
+    \end{center}
+\end{example}
+I polinomi base di Bernstein rappresentano una delle basi preferite per la
+rappresentazione di curve, in particolare per le curve di Bézier.
+Una curva 2D è definita come segue:
+\[
+C(t) = \left( f(t), g(t) \right), \quad \text{dove} \quad t \in [0,1].
+\]
+dove \( t \in [0,1] \). Ogni \( t \) individua un punto sulla curva.
+
+Utilizzando i polinomi di Bernstein come base, possiamo esprimere le funzioni
+\( f(t) \) e \( g(t) \) come segue:
+\begin{equation*}
+    \begin{aligned}
+        &f(t)=\displaystyle\sum_{i=0}^{n}x_iB_{in}(t)
+        &g(t)=\displaystyle\sum_{i=0}^{n} y_iB_{in}(t) 
+    \end{aligned} 
+\end{equation*}
+
+In termini vettoriali, la curva può essere descritta come una funzione
+vettoriale nella base di Bernstein:
+
+$$C(t) = \sum_{i=0}^{n} P_i B_{in}(t)$$
+
+dove \(P_i = (x_i, y_i)\) rappresentano i punti di controllo.
+
+Le curve di Bézier sono utilizzate nel disegno su calcolatore e nei font
+vettoriali. In questi font, un carattere è definito da curve. A differenza
+delle immagini raster, i disegni vettoriali mantengono nitidezza a qualsiasi
+livello di ingrandimento. Così, zoomando su un carattere o un disegno
+vettoriale, non si perde qualità.
+\newpage
 \end{document}
