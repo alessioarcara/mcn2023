@@ -672,6 +672,10 @@ INPUT ./images//interpolation_linear_system.jpeg
 INPUT ./images//interpolation_linear_system.jpeg
 INPUT ./images//interpolation_linear_system.jpeg
 INPUT ./images//interpolation_linear_system.jpeg
+INPUT ./images//bernstein_interpolation.jpeg
+INPUT ./images//bernstein_interpolation.jpeg
+INPUT ./images//bernstein_interpolation.jpeg
+INPUT ./images//bernstein_interpolation.jpeg
 INPUT mnc.aux
 INPUT /Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb

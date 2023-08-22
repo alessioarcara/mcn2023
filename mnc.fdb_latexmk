@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1692654401 "mnc.tex" "mnc.pdf" "mnc" 1692654402 0
+["pdflatex"] 1692740172 "mnc.tex" "mnc.pdf" "mnc" 1692740173 0
   "/Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1682419962 11524 bc6984555cd3d909220d654143e9a322 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -195,6 +195,7 @@
   "/usr/local/texlive/2023basic/texmf.cnf" 1678817979 628 bde3cc671e29677eea4172140533535c ""
   "images//bernstein_convex.jpeg" 1692478180 81358 6b8cc029983bea5e0793b5d26be5d603 ""
   "images//bernstein_decasteljau.jpeg" 1692541840 106248 840e05457475edebc2563ab3429eedff ""
+  "images//bernstein_interpolation.jpeg" 1692736945 52386 61ee9dfe1e4f69d9fb20ea19b2f628a4 ""
   "images//bernstein_one_sum.jpeg" 1692477389 44844 fafc96359b2703f1fddf1b2ca36e40c3 ""
   "images//bernstein_ricorsive.jpeg" 1692515993 193523 123362100075073b2fcce83b412fadf6 ""
   "images//bernstein_zeros.jpeg" 1692476620 41931 7194a023f35567c8c897c9734fe79e18 ""
@@ -205,9 +206,9 @@
   "images//interpolation_linear_system.jpeg" 1692650366 49002 8184e04d0120bfa945218ba414b464d4 ""
   "images//temperature.jpeg" 1692622431 103457 3c4e8887e615b22caf6f7674e377baad ""
   "images/IEEE.png" 1691385509 16956 a163e10e738617f162f1414a5df817d1 ""
-  "mnc.aux" 1692654402 4521 70cdd7f8b937bf2038074a21aae9133d "pdflatex"
-  "mnc.tex" 1692654399 104443 1d910b91b97453796dd3863ff92a51b3 ""
-  "mnc.toc" 1692654402 2647 28b5398e286808f0a432699f913aac57 "pdflatex"
+  "mnc.aux" 1692740173 5067 f1a557623c9e8a27099966a6fa0b5820 "pdflatex"
+  "mnc.tex" 1692740172 115870 c861cbc0b02ac2076471e309e15a45ef ""
+  "mnc.toc" 1692740173 2987 ed6353b717717968a315169bb38100c6 "pdflatex"
   "settings.tex" 1692644518 3695 8a96a4aa0621a64950962453c874191b ""
   (generated)
   "mnc.aux"

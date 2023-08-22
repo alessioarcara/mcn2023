@@ -1763,7 +1763,7 @@ sempre possibile individuare un altro polinomio che assume gli stessi valori
 all'interno di un intervallo che è stato traslato o scalato. Questo permette
 di definire un'applicazione (mapping) tra i due intervalli $[a,b]$ e, per
 esempio, $[0,1]$
-\begin{equation}
+\begin{equation} \label{eq:cambio_variabile}
    \begin{aligned}
        & x\in[a,b]\rightarrow t\in[0,1] \\ 
        & t=\frac{x-a}{b-a} \text{ o viceversa }x=a+t(b-a)
@@ -2052,7 +2052,7 @@ delle immagini raster, i disegni vettoriali mantengono nitidezza a qualsiasi
 livello di ingrandimento. Così, zoomando su un carattere o un disegno
 vettoriale, non si perde qualità.
 \newpage
-\section{Interpolazione}
+\section{Interpolazione polinomiale}
 \paragraph{Interpolazione di dati.} Il problema dell'interpolazione di dati
 consiste nel trovare un polinomio che passi per un insieme di punti $(x_i,
 y_i)$ dati. Più formalmente, si cerca un polinomio $p(x)$ appartenente
@@ -2229,23 +2229,314 @@ una diversa base polinomiale, allo scopo di identificare quale tra queste
 sia la migliore.
 \subsubsection{Base di Newton}
 Siano dati $n+1$ punti distinti $(x_1,y_1)$ con $i=0,\ldots,n$. Il polinomio
-interpolante nella forma di Newton usa una particolare base chiamata base
-di Newton, che viene costruita da punti 
+interpolante nella forma di Newton è costruito su una particolare base chiamata base
+di Newton, che viene costruita sui punti $x_i,\ i=0,\ldots,n$.
 
-La base di Newton è definita dalle seguenti $n+1$ funzioni base linearmente
-indipendenti 
+La base di Newton è costituita da $n+1$ funzioni base linearmente
+indipendenti
+$$1,(x-x_0),(x-x_0)(x-x_1),\ldots,(x-x_0)(x-x_1)\cdots(x-x_{n-1})$$
+e forma una base polinomiale per lo spazio $\mathbb{P}_n$.
 
-Il polinomio interpolante nella base di Newton è una combinazione lineare di
-queste funzioni base. Lo si può scrivere come:
-$$p(x)=b_0+b_1(x-x_0)+b_2(x-x_0)(x-x_1)+\ldots+b_n(x-x_0)(x-x_1)\ldots(x-x_n)$$
+Il polinomio interpolante nella base di Newton può essere scritto come combinazione lineare di
+queste funzioni base:
+$$p(x)=b_0+b_1(x-x_0)+b_2(x-x_0)(x-x_1)+\ldots+b_n(x-x_0)(x-x_1)\cdots(x-x_n)$$
 
-Imponendo le condizioni di interpolazione a questo polinomio si ottiene:
+Imponendo le condizioni di interpolazione a questo polinomio si ottiene un
+sistema di $n+1$ equazioni in $n+1$ incognite:
 \begin{equation*}
     \begin{aligned}
-        p(x_0)=y_0\Rightarrow
-        b_0+b_1\overbrace{(x_0-x_0)}^0+b_2\overbrace{(x_0-x_0)}^0(x_0-x_1)+\ldots+b_n\overbrace{(x_0-x_0)}^0(x_0-x_1)\ldots(x_0-x_{n-1})&=y_0\\ 
-        & b_0=y_0                                                                                                                            
-    \end{aligned} 
+        &p(x_0)=y_0\Rightarrow
+              &b_0+b_1\overbrace{(x_0-x_0)}^0+b_2\overbrace{(x_0-x_0)}^0(x_0-x_1)+\ldots+b_n\overbrace{(x_0-x_0)}^0(x_0-x_1)\cdots(x_0-x_{n-1})=y_0\\ 
+              & &b_0=y_0 \\                                                                                                                            
+        &p(x_1)=y_0\Rightarrow
+        &b_0+b_1(x_1-x_0)+b_2(x_1-x_0)\overbrace{(x_1-x_1)}^0+\ldots+b_n(x_1-x_0)\overbrace{(x_1-x_1)}^0\cdots(x_1-x_{n-1})=y_0\\ 
+              & &b_0+b_1(x_1-x_0)=y_0 \\ 
+        &\vdots & \vdots \\
+        &p(x_n)=y_n\Rightarrow
+              &b_0+b_1(x_n-x_0)+b_2(x_n-x_0)(x_n-x_1)+\ldots+b_n(x_n-x_0)(x_n-x_1)\cdots(x_n-x_{n-1})=y_n\\ 
+    \end{aligned}
 \end{equation*}
+Questo sistema può essere espresso in forma matriciale come:
+$$Nb=y$$
+con
+\begin{equation*}
+   \begin{aligned}
+       N&=\begin{bmatrix}
+           1 & 0 & 0 & \ldots & 0 \\ 
+           1 & (x_1-x_0) & 0 & \ldots & 0 \\ 
+           \vdots & \vdots & \ddots & & \vdots \\ 
+           1 & (x_n-x_0) & (x_n-x_0)(x_n-x_1) & \ldots & (x_n-x_0)\cdots(x_n-x_{n-1})
+       \end{bmatrix} & 
+        c&=\begin{bmatrix}
+            b_0 \\ 
+            b_1 \\ 
+            \vdots \\ 
+            b_n
+       \end{bmatrix} & 
+       y&=\begin{bmatrix}
+           y_0 \\ 
+           y_1 \\ 
+           \vdots \\ 
+           y_n
+       \end{bmatrix}
+   \end{aligned} 
+\end{equation*}
+Poiché la matrice $N$ è triangolare inferiore, il sistema è facilmente
+risolvibile per sostituzione in avanti. Ciò fornisce i coefficienti $b_i$, che
+rappresentano il polinomio che interpola i dati.
+\begin{lstlisting}[language=Python]
+def calculate_newton_base(x_bar, x):
+    return np.prod([x_bar - x_i for x_i in x])
+
+def newton_interpolation(x, y):
+    n = len(x)
+    L = np.zeros((n,n))
+    
+    L[:,0] = 1
+    for i in range(1,n):
+        for j in range(1, i+1):
+            L[i][j] = calculate_newton_base(x[i], x[:j])
+            
+    return forward_substitution(L, y)
+\end{lstlisting}
+\begin{example}
+    Siano dati nuovamente il set di punti $x=[0,1,2],y=[0,1,0]$. Vogliamo
+    determinare il polinomio che interpola questi dati utilizzando la base di
+    Newton.
+
+    Il polinomio interpolante si trova in $\mathbb{P}_2$ ed ha la
+    seguente forma:
+    \begin{equation*}
+       \begin{aligned}
+           p(x)&=b_0+b_1(x-x_0)+b_2(x-x_0)(x-x_1) \\ 
+               &=b_0+b_1(x-0)+b_2(x-0)(x-1) \\ 
+               &=b_0+b_1x+b_2x(x-1)
+       \end{aligned} 
+    \end{equation*}
+    Possiamo calcolare i coefficienti risolvendo il seguente sistema lineare:
+    \begin{equation*}
+       \begin{aligned}
+           \begin{bmatrix}
+               1 & 0 & 0 \\ 
+               1 & 1 & 0 \\ 
+               1 & 2 & 2
+           \end{bmatrix}
+           \begin{bmatrix}
+               b_0 \\ 
+               b_1 \\ 
+               b_2
+           \end{bmatrix}=
+           \begin{bmatrix}
+               0 \\ 
+               1 \\ 
+               0
+           \end{bmatrix}\\ 
+           \begin{bmatrix}
+               1 & 0 & 0 & | & 0\\
+               0 & 1 & 0 & | & 1\\
+               0 & 2 & 2 & | & 0
+           \end{bmatrix}\\
+           \begin{bmatrix}
+               1 & 0 & 0 & | & 0\\
+               0 & 1 & 0 & | & 1\\
+               0 & 0 & 1 & | & -1
+           \end{bmatrix}\\
+           p(x)=0+x-x(x-1) 
+       \end{aligned} 
+    \end{equation*}
+    Se cambiato l'ordine dei punti in $x=[0,2,1],y=[0,0,1]$, il polinomio
+    risultante rimane lo stesso. Il teorema, infatti, ci garantisce l'esistenza e
+    unicità di un polinomio che passa attraverso quei punti specifici,
+    indipendentemente dall'ordine. Quello che cambia è la base di
+    rappresentazione utilizzata per esprimere il polinomio. Anche se il
+    polinomio rimane invariato, i coefficienti possono cambiare a seconda
+    dell'ordine dei punti. Quindi analiticamente, il polinomio non cambia, ma
+    numericamente potrebbe cambiare.
+    $$p(x)=b_0+b_1(x-0)+b_2(x-0)(x-2)$$
+    \begin{equation*}
+       \begin{aligned}
+           \begin{bmatrix}
+               1 & 0 & 0 & | & 0\\
+               1 & 2 & 0 & | & 0\\
+               1 & 1 & -1 & | & 1
+           \end{bmatrix}\\
+           \begin{bmatrix}
+               1 & 0 & 0 & | & 0\\
+               0 & 2 & 0 & | & 0\\
+               0 & 1 & -1 & | & 1
+           \end{bmatrix}\\
+           \begin{bmatrix}
+               1 & 0 & 0 & | & 0\\
+               0 & 1 & 0 & | & 0\\
+               0 & 0 & 1 & | & -1
+           \end{bmatrix}\\
+           p(x)=-x(x-2)
+       \end{aligned} 
+    \end{equation*}
+\end{example}
+\paragraph{Soluzione di un sistema lineare con matrice triangolare
+inferiore.}
+Dato un sistema lineare con una matrice triangolare inferiore $L$, possiamo
+risolvere il sistema seguendo questi passaggi:
+\begin{enumerate}
+    \item Dalla prima equazione, calcoliamo l'incognita
+        $b_1=\frac{y_1}{l_{11}}$.
+    \item Sostituiamo $b_1$ nelle equazioni successive e aggiorniamo i termini
+        noti come segue: $$y_i=y_i-l_{i1}\cdot b_1, \text{ per }i=2,\ldots,n$$
+        Questo aggiornamento ``sposta'' il valore che abbiamo sostituito a
+        destra nel vettore dei termini noti, riducendo la matrice del sistema
+        e ottenendo un nuovo termine noto per tutte le equazioni successive.
+    \item Ripetiamo questo processo per tutte le incognite sconosciute,
+        calcolando ogni volta l'incognita e sostituendo.
+\end{enumerate}
+\begin{equation*}
+   \begin{aligned}
+       &\begin{bmatrix}
+           l_{11} & 0 & \ldots & 0 \\ 
+           l_{21} & l_{22} & \ldots & 0 \\ 
+           \vdots & \ddots & & \vdots \\ 
+           l_{n1} & l_{n2} & \ldots & l_{nm}
+       \end{bmatrix}
+       \begin{bmatrix}
+           b_1 \\ 
+           b_2 \\ 
+           \vdots \\ 
+           b_n
+       \end{bmatrix}= 
+       \begin{bmatrix}
+           y_1 \\ 
+           y_2 \\ 
+           \vdots \\ 
+           y_n
+       \end{bmatrix}\\
+       &\begin{bmatrix}
+           l_{22} & 0 & \ldots & 0 \\ 
+           l_{32} & l_{33} & \ldots & 0 \\ 
+           \vdots & \ddots & & \vdots \\ 
+           l_{n2} & l_{n3} & \ldots & l_{nm}
+       \end{bmatrix}
+       \begin{bmatrix}
+           b_2 \\ 
+           b_3 \\ 
+           \vdots \\ 
+           b_n
+       \end{bmatrix}= 
+       \begin{bmatrix}
+           y_2 - l_{21} *\frac{y_1}{l_{11}}  \\ 
+           y_3 - l_{31} *\frac{y_1}{l_{11}} \\ 
+           \vdots \\ 
+           y_n - l_{n1} *\frac{y_1}{l_{11}}
+       \end{bmatrix}
+   \end{aligned} 
+\end{equation*}
+Il costo computazionale di questo algoritmo è dell'ordine di
+$\mathcal{O}(m^2)$. In particolare, si effettuano $\frac{m(m+1)}{2}$ calcoli,
+ciascuno dei quali comprende un'addizione e una moltiplicazione,
+più $m$ divisioni.
+\begin{lstlisting}[language=Python]
+def forward_substitution(L, y):
+    n = len(y)
+    b = np.zeros(n)
+    b[0] = y[0] / L[0][0]
+    for k in range(0, n-1):
+        for i in range(k+1, n):
+            y[i] = y[i] - L[i][k] * b[k]
+        b[k+1] = y[k+1] / L[k+1][k+1]
+    return b.tolist()
+\end{lstlisting}
+\paragraph{Valutazione di un polinomio nella base di Newton.}
+Il polinomio nella base di Newton è dato da:
+$$p(x)=b_0+b_1(x-x_0)+b_2(x-x_0)(x-x_1)+\ldots+b_n(x-x_0)\cdots(x-x_{n-1})$$
+Possiamo esprimere il polinomio in una forma che facilita la sua valutazione,m
+similmente all'algoritmo di Horner, raccogliendo i termini simili:
+\begin{align*}
+& \quad p(x) = b_0 + b_1(x-x_0) + b_2(x-x_0)(x-x_1) + \ldots + b_n(x-x_0) \ldots (x-x_{n-1}) \\
+& \quad p(x) = b_0 + (x-x_0)(b_1 + b_2(x-x_1) + \ldots + b_n(x-x_1) \ldots (x-x_{n-1})) \\
+& \quad p(x) = b_0 + (x-x_0)(b_1 + (x-x_1)(b_2 + \ldots + b_n(x-x_2) \ldots (x-x_{n-1}))) \\
+& \quad \vdots \\
+& \quad p(x) = b_0 + (x-x_0)(b_1 + (x-x_1)(b_2 + \ldots + (x-x_{n-2})(b_{n-1} + b_n(x-x_{n-1}))\ldots)
+\end{align*}
+Questa riscrittura del polinomio rende possibile la sua valutazione seguendo
+una procedura analoga a quella dell'algoritmo di Horner. Tuttavia, a
+differenza dell'algoritmo di Horner, dove $\bar{x}$ è un valore fisso, qui
+esso è un vettore contenente tutte le differenze tra $\bar{x}$ e i punti della
+base di Newton. La valutazione viene effettuata partendo dalle parentesi
+interne e procedendo verso l'esterno.
+\begin{lstlisting}[language=Python]
+def newton_evalutation(b, x, x_bar):
+    p = b[-1]
+    for k in range(len(b)-2, -1, -1):
+        p = b[k] + (x_bar - x[k]) * p
+    return p
+\end{lstlisting}
 \subsubsection{Base di Bernstein}
+Siano dati $n+1$ punti $(x_i,y_i),i=0,\ldots,n$ con $x_i$ distinti e si vuole
+determinare $p(x)\in \mathbb{P}_n$ nella base di Bernstein:
+$$p(x)=\displaystyle\sum_{i=0}^{n}c_iB_{i,n}\quad \text{ con }x\in[a,b]$$
+tale che 
+$$p(x_i)=y_i\quad i=0,\ldots, n$$
+La base di Bernstein è costruita su un intervallo $[a,b]$, dove
+$a=\min\{x_i\}$ e $b=\max\{x_i\}$, che sarà il più piccolo intervallo che
+contenga i punti. In questo intervallo viene definito il polinomio 
+nella base di Bernstein per l'interpolazione. 
+
+Si costruisce un sistema lineare imponendo le condizioni di esistenza:
+\begin{equation*}
+   \begin{aligned}
+       & p(0)=y_0\Rightarrow&\displaystyle\sum_{i=0}^{n}c_iB_{i,n}(x_0)=y_0\\
+       & p(1)=y_1\Rightarrow&\displaystyle\sum_{i=0}^{n}c_iB_{i,n}(x_1)=y_1\\
+       & \vdots & \vdots \\ 
+       & p(n)=y_n\Rightarrow&\displaystyle\sum_{i=0}^{n}c_iB_{i,n}(x_n)=y_n\\
+   \end{aligned} 
+\end{equation*}
+Questo sistema può essere espresso in forma matriciale:
+\begin{equation*}
+    \begin{aligned}
+        \begin{bmatrix}
+            B_{0,n}(x_0) & B_{1,n}(x_0) & \ldots & B_{n,n}(x_0) \\
+            B_{0,n}(x_1) & B_{1,n}(x_1) & \ldots & B_{n,n}(x_1) \\
+            \vdots & \ddots & & \vdots \\ 
+            B_{0,n}(x_n) & B_{1,n}(x_n) & \ldots & B_{n,n}(x_n) \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            c_0 \\ 
+            c_1 \\ 
+            \vdots \\ 
+            c_n
+        \end{bmatrix}= 
+        \begin{bmatrix}
+           y_0\\ 
+           y_1 \\ 
+           \vdots \\ 
+           y_n
+        \end{bmatrix}
+    \end{aligned}
+\end{equation*}
+La matrice del sistema lineare è composta dai valori delle funzioni base di
+Bernstein valutati nel punti $x_i$. Tuttavia, per migliorare la precisione
+numerica, è conveniente traslare e scalare i punti di interpolazione
+nell'intervallo $[0,1]$ mediante la \ref{eq:cambio_variabile}. 
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{bernstein_interpolation}
+\end{center}
+Ora il problema consiste nell'interpolare i punti $(t_i,y_i),i=0,\ldots,n$ con
+un polinomio definito nella base di Bernstein:
+$$p(t)=\displaystyle\sum_{i=0}^{n}c_iB_{in}(t)\quad \text{ con }t\in[0,1]$$
+Imponendo le condizioni di esistenza, otteniamo un sistema lineare con la
+stessa matrice, ma valutata nei punti $t_i=0,\ldots,n$ invece che $x_i$.
+Questa rappresentazione consente di ottenere gli stessi coefficienti $c_i$ che
+si otterrebbero lavorando in $[a,b]$, ma con una maggiore precisione, in
+quanto meno suscettibile a problemi numerici.
+
+Per la soluzione del sistema lineare si può applicare un algoritmo ad hoc
+perché la matrice è \underline{totalmente positiva}, e perciò qualunque
+sottomatrice presa quadrata che noi ritagliamo da questa avrà il determinante
+$>0$. Per matrici fatte così esistono algoritmi efficienti per trovare una
+soluzione con complessità $\mathcal{O}(n^2)$.
+\subsubsection{Base di Lagrange}
+Sia il metodo di Newton che il metodo di Bernstein, l'interpolazione richiede
+la soluzione di un sistema lineare. Esiste però un metodo di interpolazione
+che elimini completamente la necessità di risolvere un sistema lineare? 
+\newpage
+\section{Integrazione numerica}
 \end{document}
