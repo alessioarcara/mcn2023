@@ -2102,7 +2102,7 @@ comporta:
     \item \textbf{Valutazione dell'errore}:
         \begin{itemize}
             \item Una volta costruito il polinomio, si valuta l'errore
-                $\left\lvert p(x)-f(x) \right\rvert$ per ogni $x\in[a,b]$ per
+                $\left\lvert f(x) - p(x)\right\rvert$ per ogni $x\in[a,b]$ per
                 misurare l'accuratezza dell'approssimazione.
         \end{itemize}
 \end{enumerate}
@@ -2537,6 +2537,227 @@ soluzione con complessità $\mathcal{O}(n^2)$.
 Sia il metodo di Newton che il metodo di Bernstein, l'interpolazione richiede
 la soluzione di un sistema lineare. Esiste però un metodo di interpolazione
 che elimini completamente la necessità di risolvere un sistema lineare? 
+
+Supponiamo di avere un insieme di punti $(x_i,y_i)$ e vogliamo trovare un
+polinomio $p(x)\in \mathbb{P}_n$ che li interpoli. 
+
+Anziché risolvere il problema di interpolazione su tutti i dati, possiamo
+semplificarlo \underline{costruendo} un polinomio che ha zeri in tutti i punti
+$x_i$, tranne in uno specifico punto $x_j$, dove vogliamo che il polinomio
+valga 1. Per il Teorema \ref{eq:teorema_fondamentale_algebra}, i polinomi
+$L_{i,n}(x)$ avendo come radici i punti $x_j$ con $j=0,\ldots,n$ e $j\neq i$
+saranno nella forma
+$$L_{i,n}(x)=d_i(x-x_0)(x-x_1)\cdots(x-x_{i-1})(x-x_{i+1})\cdots(x-x_n)$$ con
+$d_i$ una costante da determinare in modo che $L_{i,n}(x_i)=1$. Troviamo $d_i$
+come:
+\begin{equation*}
+   \begin{aligned}
+       d_i(x_i-x_0)(x_i-x_1)\cdots(x_i-x_{i-1})(x_i-x_{i+1})\cdots(x_i-x_n)=1\\ 
+       d_i=\frac{1}{(x_i-x_0)(x_i-x_1)\cdots(x_i-x_{i-1})(x_i-x_{i+1})\cdots(x_i-x_n)}\\ 
+   \end{aligned}
+\end{equation*}
+da cui in definitiva
+\begin{equation*}
+   \begin{aligned}
+       L_{i,n}(x)=&\frac{(x-x_0)(x-x_1)\cdots(x-x_{i-1})(x-x_{i+1})\cdots(x-x_n)}{(x_i-x_0)(x_i-x_1)\cdots(x_i-x_{i-1})(x_i-x_{i+1})\cdots(x_i-x_n)}
+       \\ 
+       &=\frac{\prod_{j=0,j\neq i}^n(x-x_j)}{\prod_{j=0,j\neq
+       i}(x_i-x_j)}\quad i=0,\ldots,n
+   \end{aligned} 
+\end{equation*}
+Sono $n+1$ funzioni che formano una base polinomiale per lo spazio
+$\mathbb{P}_n$ detta base di Lagrange.
+$$\left\{L_{0,n}(x),L_{1,n}(x),\ldots,L_{n,n}(x)\right\}\in \mathbb{P}_ n$$
+Ora che abbiamo questi polinomi base di Lagrange, il problema è banalmente
+risolto da 
+\begin{equation}\label{eq:polinomio_forma_lagrange}
+    \begin{aligned}
+        p(x)=\displaystyle\sum_{i=0}^{n}y_iL_{i,n}(x)
+    \end{aligned}
+\end{equation}
+infatti per le condizioni $L_{i,j}(x_j)=\begin{cases}
+    1 & \text{se }i=j\\ 
+    0 & \text{altrimenti}
+\end{cases}$ che definiscono i polinomi $L_{i,n}(x)$,
+banalmente in ogni punto $x_j$ l'espressione polinomiale
+\ref{eq:polinomio_forma_lagrange} varrà $y_j$ per ogni $j=0,\ldots,n$.
+
+Dal punto di vista computazionale determinare tale polinomio non costa
+\underline{nulla}, essendo i coefficienti del polinomio in tale base proprio i
+valori $y_i$ assegnati. Al contrario la valutazione del polinomio interpolante
+comporta la determinazione e la valutazione dei polinomi $L_{i,n}(x)$.
+\paragraph{Valutazione di un polinomio nella base di Lagrange.}
+Calcolare i polinomi base di Lagrange può essere costoso, ma possiamo
+semplificarlo utilizzando una formula alternativa.
+\begin{itemize}
+    \item [\textbf{I}] \textbf{forma baricentrica}:\\
+        Iniziamo con il polinomio di Lagrange:
+        $$L_{i,n}(x)=d_i\prod_{j=0,j\neq i}^n(x-x_j)$$
+        dove $d_i=\frac{1}{\prod_{j=0,j\neq i}(x_i-x_j)}$
+
+        Possiamo calcolare \underline{una volta sola} prima di valutare il polinomio:
+        $$p(\bar{x})=\displaystyle\sum_{i=0}^{n}y_iL_{i,n}(\bar{x})$$
+        Successivamente, determiniamo:
+        $$l(x)=(x-x_0)(x-x_1)\cdots(x-x_n)$$
+        cioè, il prodotto di tutti i termini senza saltarne nessuno e
+        riscriviamo il polinomio di Lagrange come:
+        $$L_{i,n}(x)=d_i \frac{l(x)}{x-x_i}$$
+        Da cui segue:
+        $$p(x)=\displaystyle\sum_{i=0}^{n}y_i \frac{w_il(x)}{x-x_i}$$
+        Poiché $l(x)$ non dipende più dall'indice di sommatoria, possiamo
+        portarlo fuori:
+        $$l(x)\displaystyle\sum_{i=0}^{n}y_i \frac{w_i}{x-x_i}$$
+        dove $w_i$ e $l(x)$ vengono calcolati una sola volta con $n$
+        moltiplicazioni, e all'interno della sommatoria vengono effettuate 2
+        moltiplicazioni per $n$ volte. Il costo computazionale totale per la
+        valutazione è quindi $\mathcal{O}(n)$.
+    \item [\textbf{II}] \textbf{forma baricentrica}:\\ 
+        Consideriamo il polinomio nella forma di Lagrange che interpola $(x_i,
+        y_i=1)$ per $i=0,\ldots,n$. Essendo la funzione costante $1$ l'unica
+        che interpola i nostri dati in $\mathbb{P}_n$, allora  il polinomio
+        nella I forma di Lagrange corrispondente a 1, è dato da:
+        \begin{equation}\label{eq:lagrange_1}
+           \begin{aligned}
+               p(x)=l(x)\displaystyle\sum_{i=0}^{n}\frac{d_i}{x-x_i}1=1
+           \end{aligned} 
+        \end{equation}
+        \begin{center}
+            \includegraphics[width=0.4\linewidth]{lagrange_2_form}
+        \end{center}
+        Ora, dividendo la I forma di Lagrange per 1, ma scrivendo 1 come in
+        \ref{eq:lagrange_1}, otteniamo: 
+        \begin{equation*}
+           \begin{aligned}
+               p(x)=\frac{\cancel{l(x)}\displaystyle\sum_{i=0}^{n}y_i
+                   \frac{d_i}{x-x_i}}{\cancel{l(x)} \displaystyle\sum_{i=0}^{n}
+           \frac{d_i}{x-x_i}}
+           \end{aligned} 
+        \end{equation*}
+        Il vantaggio di questa rappresentazione deriva dal fatto che,
+        avendo semplificato analiticamente
+        $l(x)$, non è più necessario calcolarlo. Il costo computazionale
+        rimane $\mathcal{O}(n)$, ma con meno operazioni da fare, e si svolge come segue:
+        \begin{itemize}
+            \item Nel ciclo, si eseguono una divisione e una moltiplicazione
+                al numeratore.
+            \item Dopo il ciclo, si effettua un'ultima divisione.
+        \end{itemize}
+        Questo rende l'algoritmo più efficiente e \underline{altamente stabile
+        numericamente}.
+\end{itemize}
+\begin{lstlisting}[language=Python]
+def calculate_di(x, i):
+    return 1/np.prod([x[i] - x[j] for j in range(len(x)) if j != i])
+
+def lagrange_evaluation(x, y, x_bar):
+    n = len(x)
+    d = [calculate_di(x, i) for i in range(n)]
+    
+    num = 0
+    den = 0
+    for i in range(n):
+        div = d[i]/(x_bar-x[i])
+        num += y[i] * div
+        den += div
+    return num/den
+\end{lstlisting}
+\subsection{Errore di interpolazione (interpolazione di funzioni)}
+\begin{recap}
+    I termini \( C^k \) dove \( k \) è un intero non negativo, sono utilizzati per classificare le funzioni in base alla loro regolarità. Nello specifico:
+    \begin{itemize}
+        \item \( C^0 \): La funzione è continua.
+        \item \( C^1 \): La funzione ha una derivata prima continua.
+        \item \( C^2 \): La funzione ha derivate prima e seconda continue.
+        \item \( \vdots \)
+        \item \( C^\infty \): La funzione è infinitamente differenziabile e tutte le sue derivate sono continue.
+    \end{itemize}
+    Queste notazioni sono utilizzate per indicare quanto sia ``liscia" una funzione, cioè quante derivate continue possiede.
+\end{recap}
+Sia $f(x)$ è la funzione assegnata nell'intervallo $[a,b]$ e sia $p(x)$ il
+polinomio interpolante nei punti $(x_i,f(x_i)),i=0,\ldots,n$; ha senso chiedersi quanto sia grande l'errore di
+interpolazione
+$$R(x)=\left\lvert f(x)-p(x)\right\rvert$$
+che si commette in un punto $\bar{x}\in[a,b]$ diverso dai punti di
+interpolazione $x_i$.
+\begin{theorem}
+    Sia $f(x)\in C_{[a,b]}^{(n+1)}$; siano $x_0,x_1,\ldots,x_n\in[a,b]$ punti
+    di interpolazione distinti allora esiste un punto $\xi$ che dipende da
+    $\bar{x}$ (punto di valutazione) per cui 
+    $$f(\bar{x})=p(\bar{x})+{\color{red}\frac{w(\bar{x})}{(n+1)!}f^{(n+1)}(\xi)}$$
+    con $w(\bar{x})=(\bar{x}-x_0)(\bar{x}-x_1)\cdots(\bar{x}-x_n)$.
+\end{theorem}
+La parte evidenziata in {\color{red}rosso} rappresenta l'errore di interpolazione. Questa
+quantità ci mostra come l'errore dipende dalla regolarità della funzione
+($(n+1)$-esima derivata), dai punti interpolanti scelti, e dal punto di
+valutazione $\bar{x}$ specifico.
+\begin{example}
+    Sia $f(x)=e^x$ con $x\in[a,b]$. Si osserva che:
+    \begin{itemize}
+        \item $\left\lvert f^{(n+1)}(\xi)\right\rvert\leq e^b$
+        \item $w(\bar{x})=(\bar{x}-x_0)(\bar{x}-x_1)\cdots(\bar{x}-x_n)\leq(b-a)(b-a)\ldots(b-a)=(b-a)^{n+1}$
+    \end{itemize}
+    da cui 
+    $$R(x)\leq
+    \frac{(b-a)^{n+1}}{(n+1)!}e^{b}\underset{n\rightarrow\infty}{\to}0$$
+    Notiamo che il fattore $(n+1)!$ cresce più velocemente di $(b-a)^{n+1}$, e
+    quindi l'intero fattore tende a zero quando $n$ tende all'infinito.
+
+    Questo dimostra che il polinomio interpolante converge alla funzione
+    all'aumentare del numero dei punti di interpolazione.
+    \begin{center}
+        \includegraphics[width=0.4\linewidth]{e_x}
+    \end{center}
+
+\end{example}
+\subsubsection{Punti equispaziati e di Chebyshev} Consideriamo la funzione
+$f(x)=\frac{1}{1+x^2}$, definita sull'intervallo $x\in[-5,5]$, 
+e il polinomio di interpolazione costruito utilizzando $n+1$ punti
+\underline{equispaziati} $x_i=\frac{10}{n}i-5\quad i=0,\ldots,n$. 
+
+Il matematico Runge dimostrò un caso in cui l'errore di interpolazione non
+migliora, ma peggiora all'aumentare dei punti. Invece di convergere alla
+funzione, il polinomio inizia ad oscillare vicino agli estremi
+dell'intervallo, e queste oscillazioni si intensificano all'aumentare del numero di
+punti in cui vado ad interpolare e del grado del polinomio che vado ad
+utilizzare.
+
+La causa di questo comportamento risiede proprio nella scelta dei punti
+equispaziati.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{runge}
+    \caption{Interpolazione polinomiale della funzione di Runge su 11 punti
+    equispaziati}
+\end{figure}
+\begin{theorem}
+    Sia $I\in[-1,1]$ e i punti di interpolazione siano gli zeri del polinomio
+    di Chebyshev di grado $n+1$.
+
+    Se $f(x)\in C_{I}^0$ e soddisfa la condizione di Lipschitz\footnote{
+        La condizione di Lipschitz richiede che la funzione non abbia
+        variazioni troppo brusche tra due punti vicini, aiutando a garantire
+        la regolarità della funzione.
+    }
+    $$\left\lvert f(\bar{x}-f(\tilde{x}))\right\rvert< K \left\lvert
+    \bar{x}-\tilde{x}\right\rvert$$
+    allora il polinomio interpolante converge uniformemente a $f(x)$ su $I$
+    per $n\to\infty$ e $\left\lvert
+    f(x)-p_n(x)\right\rvert\underset{n\rightarrow\infty}{\to}0$
+\end{theorem}
+Quindi se i punti di interpolazione vengono sono scelti opportunamente (come per esempio
+gli zeri del polinomio di Chebyshev di grado $n+1$\footnote{
+    $x_i=\cos(\frac{(2i+1)\pi}{2(n+1)}),\quad i=0,\ldots,n$ sono gli $n+1$
+    zeri reali del polinomio di Chebyshev di prima specie di grado $n+1$
+    definito in $[-1,1]$; se i punti di interpolazione sono in $[a,b]$ si
+    applichi un mapping degli zeri da $[-1,1]$ in $[a,b]$
+}) e la funzione $f(x)$ è Lipschitziana si ha la convergenza dell'interpolante
+polinomiale. Più la $f$ è regolare e più veloce la convergenza.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{chebyshev}
+    \caption{Interpolazione polinomiale della funzione di Runge su 21 punti zeri
+    di Chebyshev}
+\end{figure}
 \newpage
 \section{Integrazione numerica}
 \end{document}
