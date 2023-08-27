@@ -6,4 +6,3 @@
 | `ieee754.ipynb`      | [Notebook Jupyter](./ieee754.ipynb) |
 | `interpolation.ipynb`| [Notebook Jupyter](./interpolation.ipynb) |
 | `mnc.tex`            | [File LaTeX](./mnc.tex) |
-| `esercitazioni/`     | |
