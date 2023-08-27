@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1692828164 "mnc.tex" "mnc.pdf" "mnc" 1692828165 0
+["pdflatex"] 1693120516 "mnc.tex" "mnc.pdf" "mnc" 1693120517 0
   "/Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1682419962 11524 bc6984555cd3d909220d654143e9a322 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/local/texlive/2023basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -210,12 +210,13 @@
   "images//error_amplification.png" 1692421410 27517 aea9042ac6f25d7be7cd4eca26a2ab36 ""
   "images//interpolation_linear_system.jpeg" 1692650366 49002 8184e04d0120bfa945218ba414b464d4 ""
   "images//lagrange_2_form.jpeg" 1692797208 41823 931575f78db8bb8870178ece7dae0d17 ""
+  "images//piecewise_polynomial.png" 1693118067 24633 335017fd2435229b5ee6cb3901f6d55c ""
   "images//runge.png" 1692817587 41987 2aa63c2ba0e366045625e0abfea594b5 ""
   "images//temperature.jpeg" 1692622431 103457 3c4e8887e615b22caf6f7674e377baad ""
   "images/IEEE.png" 1691385509 16956 a163e10e738617f162f1414a5df817d1 ""
-  "mnc.aux" 1692828165 5922 0bb2531556472f5d007d51c7daa3588c "pdflatex"
-  "mnc.tex" 1692828162 126486 5ac2e539615763cba085f8d10480123a ""
-  "mnc.toc" 1692828165 3270 257314a4c2ae713a52854fea214407ee "pdflatex"
+  "mnc.aux" 1693120517 6209 4e87b80959ca9ebea2bfaa53da03d6ac "pdflatex"
+  "mnc.tex" 1693120514 134914 e0e870a35e7e5c616fba2b847648ad78 ""
+  "mnc.toc" 1693120517 3475 ffca050c2b48ff661994a3669a9477e1 "pdflatex"
   "settings.tex" 1692826640 3950 6c9d6deaf4aec0b475801dce646445f4 ""
   (generated)
   "mnc.aux"

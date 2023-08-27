@@ -692,6 +692,10 @@ INPUT ./images//chebyshev.png
 INPUT ./images//chebyshev.png
 INPUT ./images//chebyshev.png
 INPUT ./images//chebyshev.png
+INPUT ./images//piecewise_polynomial.png
+INPUT ./images//piecewise_polynomial.png
+INPUT ./images//piecewise_polynomial.png
+INPUT ./images//piecewise_polynomial.png
 INPUT mnc.aux
 INPUT /Users/alessioarcara/Library/texlive/2023basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk
 INPUT /usr/local/texlive/2023basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb

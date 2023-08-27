@@ -2758,6 +2758,202 @@ polinomiale. Più la $f$ è regolare e più veloce la convergenza.
     \caption{Interpolazione polinomiale della funzione di Runge su 21 punti zeri
     di Chebyshev}
 \end{figure}
+\subsection{Interpolazione polinomiale a tratti}
+I polinomi non sono sufficientemente flessibili per approssimare funzioni che
+hanno differenti andamenti in differenti parti dell'intervallo di
+definizione. Se si usa un polinomio di grado basso, questo 
+approssima bene le parti lisce della funzione ma fallisce nel rappresentare
+le parti più variabili. Al contrario, aumentando il grado del polinomio, si
+ottiene una buona approssimazione delle parti più variabili, ma ciò 
+potrebbe causare un comportamento oscillante nelle regioni in cui la funzione
+è più liscia.
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel=\(x\),
+            ylabel={\(f(x)\)},
+            legend pos=outer north east,
+            domain=-2:2,
+            samples=500
+            ]
+
+            % Funzione regolare seguita da un'oscillazione
+            \addplot[blue] {x < 0 ? x : sin(20*deg(x))};
+
+            % Linee verticali per l'intervallo [a,b]
+            \draw [dashed, gray] (axis cs: -2, -2) -- (axis cs: -2, 2);
+            \draw [dashed, gray] (axis cs: 2, -2) -- (axis cs: 2, 2);
+
+            \node [below] at (axis cs: -2, -2) {\(a\)};
+            \node [below] at (axis cs: 2, -2) {\(b\)};
+
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+Una soluzione a questo problema è utilizzare la classe dei polinomi a tratti.
+\begin{definition}
+    Sia $[a,b]$ un intervallo e siano$\left\{x_i\right\}_{i=1,\ldots,m-1}$ punti
+    distinti e crescenti dell'intervallo $[a,b]$, cioè
+    $$a=x_0<x_1<x_2<\ldots<x_m-1<x_m=b$$
+    Questa sequenza di punti forma una \underline{partizione} dell'intervallo $[a,b]$ in
+    $m$ sottointervalli. Allora si definisce un polinomio a tratti la
+    funzione:
+    $$pp(x)=\begin{cases}
+        p_0(x) & x \in[x_0,x_1]\\
+        p_1(x) & x \in[x_1,x_2]\\
+        \vdots \\
+        p_{m-1}(x) & x \in[x_{m-1},x_m]
+    \end{cases}$$
+\end{definition}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel=\(x\),
+            ylabel={\(y\)},
+            legend pos=north west,
+            domain=-1:1,
+            samples=100,
+            ]
+
+            \addplot[blue, domain=-1:-0.5] {x^2};
+            \addplot[blue, only marks] coordinates {(-1,1) (-0.5,0.25)};
+
+            \addplot[red, domain=-0.5:0] {-x^3};
+            \addplot[red, only marks] coordinates {(-0.5, 0.125) (0,0)};
+
+            \addplot[green, domain=0:0.5] {x^3};
+            \addplot[green, only marks] coordinates {(0,0) (0.5,0.125)};
+
+            \addplot[brown, domain=0.5:1] {-x^2};
+            \addplot[brown, only marks] coordinates {(0.5,-0.25) (1,-1)};
+
+            \draw [dashed, gray] (axis cs: -1, -1) -- (axis cs: -1, 2);
+            \draw [dashed, gray] (axis cs: 1, -1) -- (axis cs: 1, 2);
+
+            \node [below] at (axis cs: -1, -1) {\(a\)};
+            \node [below] at (axis cs: 1, -1) {\(b\)};
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+Questa classe di polinomi risolve il problema dell'inflessibilità nella
+rappresentazione delle funzioni. Consente di partizionare un
+intervallo in sottointervalli e di utilizzare polinomi distinti per ciascun
+sottointervallo. In questo modo, si può  adattare la rappresentazione ai vari comportamenti
+della funzione all'interno dell'intervallo complessivo.
+
+Tuttavia, questa soluzione introduce un problema di discontinuità nei nodi,
+cioè nei punti in cui i sottointervalli si congiungono. Questa discontinuità
+può essere problematica quando si vuole ricostruire una funzione che dovrebbe
+essere regolare. 
+
+Per risolvere questo problema, imponiamo delle \textsc{condizioni di
+continuità} nei nodi. In altre parole, si può richiedere che i polinomi nei
+tratti interni si accordino di valore
+$$p_{i-1}(x)\equiv p_i(x)\quad i=i,\ldots,m-1$$
+Oltre a ciò, possiamo imporre che le derivate $\ell$-esime si accordino di
+valore nei nodi. In questo modo, si ottiene un certo ordine di continuità
+$C^{l}$, che garantisce maggiore regolarità.
+$$p^{(\ell)}_{i-1}(x)\equiv p_{i}^{(\ell)}\quad i=i,\ldots,m-1\text{ e }\ell=1,\ldots,n-1$$
+Quando $\ell=n-1$ si ha la massima regolarità e la funzione polinomiale a
+tratti viene chiamata funzione \textbf{spline}.
+\vskip 0.1in
+Con interpolazione polinomiale a tratti si intende l'interpolazione di un set
+di dati in un intervallo $[a,b]$ con una funzione polinomiale a tratti. In
+particolare, siano assegnati $m+1$ punti distinti e ordinati, cioè siano
+assegnati $(x_i,y_i)\ i=0,\ldots,m$ con $x_i<x_{i+1}\ \forall i$. L'intervallo
+$[a,b]$ è il più piccolo intervallo che contiene questi punti, quindi avremo $a=x_0$ e
+$b=x_{m}$. 
+
+Utilizziamo i punti di interpolazione $x_i$ per partizionare l'intervallo
+$[a,b]$ in sottointervalli:
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw (0,0) -- (10,0);
+
+        \foreach \x/\label in {0/{$a=x_0$}, 2/{$x_1$}, 8/{$x_{m-1}$}, 10/{$b=x_m$}}
+        {
+            \draw (\x,-0.2) -- (\x,0.2);
+            \node[below] at (\x,-0.2) {\label};
+        }
+    \end{tikzpicture}
+\end{center}
+
+Definiamo un polinomio a tratti come segue:
+$$pp(x)=\begin{cases}
+    p_0(x) & x\in[x_0,x_1]\\
+    \vdots \\
+    p_{m-1}(x) & x\in[x_{m-1},x_m]
+\end{cases}$$
+Successivamente, imponiamo le condizioni di interpolazione $pp(x_i)=y_i,i=0\ldots,m$:
+\begin{equation*}
+    \begin{array}{ccc}
+        p_0(x_0) = y_0, & \ldots, & p_{m-1}(x_m) = y_m
+    \end{array}
+\end{equation*}
+\begin{example}
+    Siano dati $(x_i,y_i)_{i=0,\ldots,2}=\left\{(1,1),(2,2),(3,1)\right\}$.
+    Scegliamo $p(x)\in \mathbb{P}_1$, cioè un polinomio di grado 1 per
+    ciascuno degli intervalli $[x_0,x_1]$ e $[x_1,x_2]$. Per farlo,
+    utilizziamo la formula per un polinomio lineare tra due punti.
+    \begin{center}
+        \includegraphics[width=0.6\linewidth]{piecewise_polynomial}
+    \end{center}
+\end{example}
+\subsection{Condizionamento dell'interpolazione (interpolazione di funzioni)}
+L'uso della forma di Lagrange per il polinomio interpolante è molto comoda per
+analizzare l'errore inerente associato a questo problema.
+
+Consideriamo il polinomio interpolante nella forma di Lagrange:
+$$p(x)=\displaystyle\sum_{i=0}^{n}f(x_i)L_{i,n}(x)$$
+Nell'analisi del condizionamento di questo problema, dobbiamo identificare
+i dati  coinvolti. Poiché gli $x_i$ sono numeri finiti scelti da noi, non sono
+soggetti a errori di approssimazione. L'errore potrebbe verificarsi nel 
+valore della funzione $f$, dato che potrebbe essere rappresentato in modo
+approssimato.
+
+Supponiamo ora che gli $f(x_i)$ siano perturbati da una quantità $\delta
+f(x_i)$, e denotiamo le valutazioni della funzione perturbate come:
+$$\hat{f}(x_i)=f(x_i)+\delta f(x_i)$$ 
+Di conseguenza, il polinomio perturbato sarà:
+\begin{equation*}
+   \begin{aligned}
+       \hat{p}(x)=\displaystyle\sum_{i=0}^{n}\hat{f}L_{i,n}(x)
+   \end{aligned} 
+\end{equation*}
+L'errore inerente in questo caso consiste nel valutare la differenza tra
+$p(x)$ e $\hat{p}(x)$, ovvero tra il polinomio calcolato con i dati esatti e
+il polinomio calcolato con i dati perturbati.
+\begin{equation*}
+   \begin{aligned}
+       \left\lvert \hat{p}(x)-p(x)\right\rvert &=\left\lvert
+           \displaystyle\sum_{i=0}^{n}(f(x_i)+\delta
+       f(x_i))L_{i,n}(x)-\displaystyle\sum_{i=0}^{n}f(x_i)L_{i,n}(x)\right\rvert\\ 
+                         &= \left\lvert \displaystyle\sum_{i=0}^{n}\delta
+                         f(x_i)L_{i,n}(x)\right\rvert\\
+                         &\leq \displaystyle\sum_{i=0}^{n} \left\lvert \delta
+                         f(x_i)\right\rvert \left\lvert
+                         L_{i,n}(x)\right\rvert\\ 
+                         &\leq \max_{0\leq i\leq n}\left\lvert \delta
+                         f(x_i)\right\rvert
+                         {\color{red}\displaystyle\sum_{i=0}^{n}\left\lvert
+                         L_{i,n}(x)\right\rvert}
+   \end{aligned} 
+\end{equation*}
+Definiamo il numero di condizione del problema di interpolazione nel punto $x$
+come:
+$$C_{\text{Int}}(p(x))=\displaystyle\sum_{i=0}^{n}\left\lvert L_{i,n}(x)\right\rvert$$
+Il massimo numero di condizione su tutto il dominio $X$ sarà quindi:
+$$\Lambda_n(X)=\max_{x\in X} C_{\text{Int}}(p(x))\quad \text{ con }X=\left\{
+    x_0,x_1,\ldots,x_n
+\right\}$$
+Questa è chiamata \textbf{costante di Lesbegue}. Se la costante è dell'ordine
+di $\log(n)$, allora il problema è ben condizionato; altrimenti, è mal
+condizionato.
 \newpage
 \section{Integrazione numerica}
+\begin{theorem}[Teorema fondamentale del calcolo integrale]
+
+\end{theorem}
 \end{document}
