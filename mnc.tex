@@ -2954,6 +2954,171 @@ condizionato.
 \newpage
 \section{Integrazione numerica}
 \begin{theorem}[Teorema fondamentale del calcolo integrale]
-
+    Sia $f: [a,b]\rightarrow \mathbb{R}$ una funzione integrabile. Supponiamo
+    che $f$ abbia una primitiva $F:[a,b]\rightarrow \mathbb{R}$. Allora
+    $$\displaystyle\int_{a}^{b}f(x)\ dx=F(b)-F(a)=F(x)\big|_{x=a}^b$$
 \end{theorem}
+Questo teorema afferma che il calcolo di un integrale può essere semplificato trovando
+una primitiva della funzione e valutandola agli estremi dell'intervallo.
+È importante notare, però, che non tutte le funzioni possiedono una primitiva. 
+\begin{example}
+   $$\int_{0}^{1}x\ dx=\frac{1}{2}x^2\bigg|_{x=0}^{1}=\frac{1}{2}$$ 
+   $$\int_{0}^{1}e^x\ dx=e^x \big|_{x=0}^{1}=e-1$$
+\end{example}
+Se la funzione da integrare è difficile da risolvere analiticamente, non
+possiede una primitiva o è irrazionale, l'approccio rimanente è quello di
+procedere numericamente calcolando un valore approssimato del suo integrale. 
+
+L'idea dietro all'integrazione numerica  consiste nell'approssimare la
+funzione $f(x)$ con un polinomio ottenuto tramite l'interpolazione
+polinomiale. Questo polinomio interpolante viene poi integrato nell'intervallo
+$[a,b]$ per ottenere un'approssimazione del valore dell'integrale.
+\begin{center}
+    \includegraphics[width=0.45\linewidth]{integral_error}
+\end{center}
+Poiché l'integrazione viene effettuata su un approssimazione polinomiale, si
+introduce inevitabilmente un errore. Questo errore si manifesta come aree in
+eccesso o in difetto, che contribuiscono all'errore rispetto al risultato
+finale.
+$$\displaystyle\int_{a}^{b}f(x)\ dx= \displaystyle\int_{a}^{b}p(x)\
+dx+\text{errore}\approx \displaystyle\int_{a}^{b}p(x)\ dx$$
+\subsection{Formule di quadratura}
+Scegliamo $n+1$ punti di interpolazione $x_i$ distribuiti uniformemente
+nell'intervallo $[a,b]$. Questi punti sono dati da:
+$$x_i=a+ih\quad i=0,\ldots,n\quad\text{con}\quad
+h=\frac{b-a}{n}\quad\text{per}\quad n>0$$
+Successivamente, costruiamo un polinomio
+interpolante $p\in \mathbb{P}_n$ sui punti
+$(x_i,f(x_i))_{i=0,\ldots,n}$. Questo polinomio è espresso nella forma di
+Lagrange:
+$$p(x)=\displaystyle\sum_{i=0}^{n}f(x_i)L_{i,n}(x)$$
+Per approssimare l'integrale di $f(x)$ sull'intervallo $[a,b]$, possiamo
+sostituire la funzione integranda $f(x)$ con il polinomio interpolante $p(x)$:
+\begin{equation*}
+    \begin{aligned}
+        \displaystyle\int_{a}^{b}f(x)\ dx\approx
+        \displaystyle\int_{a}^{b}p(x)\ dx&=\displaystyle\int_{a}^{b}\displaystyle\sum_{i=0}^{n}f(x_i)L_{i,n}(x)\
+        dx \\
+        \alignedintertext{Applicando la proprietà che l'integrale della somma
+        è la somma degli integrali e notando che $f(x_i)$ è una costante
+    rispetto all'integrazione, otteniamo:}\\
+                                         &=\displaystyle\sum_{i=0}^{n}f(x_i)\displaystyle\int_{a}^{b}L_{i,n}(x)\
+        dx \\
+        \alignedintertext{Definiamo ora gli
+        integrali dei polinomi di Lagrange su $[a,b]$ come i coefficienti $w_i$:}
+                                         &=\displaystyle\sum_{i=0}^{n}f(x_i)w_i
+    \end{aligned}
+\end{equation*}
+Questa è la \textbf{formula di quadratura}, una combinazione lineare della
+funzione $f(x)$ pesata dai coefficienti $w_i$.
+Procediamo alla loro integrazione. 
+\begin{equation*}
+   \begin{aligned}
+       \displaystyle\int_{a}^{b}L_{i,n}(x)\ dx&=\displaystyle\int_{a}^{b}\prod_{j=0,j\neq i}\frac{x-x_j}{x_i-x_j}\
+       dx \\
+       \alignedintertext{Effettuiamo un cambio di variabile di integrazione da
+       $x\in[a,b]$ a $t\in[0,n]$ mediante la $x=a+ht$ con $h=\frac{b-a}{n}$}\\ 
+                                              &=\displaystyle\int_{0}^{n}\prod_{j=0,j\neq
+       i}\frac{\cancel{a}+\cancel{h}t-\cancel{a}-\cancel{h}j}{\cancel{a}+\cancel{h}i-\cancel{a}-\cancel{h}j}h\
+       dt \\  
+                                              &=h{\color{red}\displaystyle\int_{0}^{n}\prod_{j=0,j\neq
+       i}\frac{t-j}{i-j}\ dt}\\ 
+                                              &=h{\color{red}W_i}
+   \end{aligned} 
+\end{equation*}
+Notiamo che che i coefficienti $W_i$, dipendono soltanto dal grado $n$ del polinomio interpolante e
+non dalla specifica funzione $f(x)$  da integrare o dall'intervallo $[a,b]$.
+Quindi, una volta calcolati, possono essere utilizzati  per approssimare
+l'integrale di qualsiasi funzione $f(x)$ senza doverli ricalcolare.
+\subsubsection{Formula (dei Trapezi) per $n=1$}
+Si procede al calcolo dei $W_i$ per $i=0,1$ (caso $n=1$).
+$$W_0=\displaystyle\int_{0}^{1}\frac{t-1}{0-1}\
+dt=\displaystyle\int_{0}^{1}1-t\ dt=\left(-\frac{t^2}{2}+t
+\right)\bigg|_{x=0}^{1}=\frac{1}{2}$$
+
+$$W_1=\displaystyle\int_{0}^{1}\frac{t-0}{1-0}\
+dt=\displaystyle\int_{0}^{1}t\ dt=\frac{t^2}{2}
+\bigg|_{x=0}^{1}=\frac{1}{2}$$
+e quindi 
+$$\displaystyle\int_{a}^{b}f(x)\
+dx\approx\displaystyle\int_{a}^{b}p_1(x)=h
+\displaystyle\sum_{i=0}^{1}f(x_i)W_i=\frac{h}{2}(f(x_0)+f(x_1))$$
+
+\begin{figure}[!ht]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines=middle,
+            xlabel=\(x\),
+            ylabel=\(f(x)\),
+            ymin=0,
+            ymax=20,
+            xmin=0,
+            xmax=5,
+            xtick={1,4},
+            xticklabels={\(a\), \(b\)},
+            samples=100
+            ]
+            % Funzione da integrare (es. f(x) = x^2)
+            \addplot[blue, domain=1:4] {x^2};
+
+            % Trapezio
+            \draw[red, thick] (axis cs:1,1) -- (axis cs:4,16) -- (axis cs:4,0) -- (axis cs:1,0) -- cycle;
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Interpolazione lineare per formula dei trapezi}
+\end{figure}
+\newpage
+\subsubsection{Formula (di Simpson) per $n=2$}
+Si procede al calcolo dei $W_i$ per $i=0,1,2$ (caso $n=2$).
+
+$$W_0=\displaystyle\int_{0}^{2}\frac{t-1}{0-1}\frac{t-2}{0-2}\
+dt=\frac{1}{2}\displaystyle\int_{0}^{2}t^2-3t+2\
+dt=\frac{1}{2}\left(\frac{t^3}{3}-\frac{t^2}{2}+2t
+\right)\bigg|_{x=0}^{2}=\frac{1}{3}$$
+$$W_1=\displaystyle\int_{0}^{2}\frac{t-0}{1-0}\frac{t-2}{1-2}\
+dt=-\displaystyle\int_{0}^{2}t^2-2t\
+dt=-\left(\frac{t^3}{3}-2\frac{t^2}{2}
+\right)\bigg|_{x=0}^{2}=\frac{4}{3}$$
+$$W_2=\displaystyle\int_{0}^{2}\frac{t-0}{2-0}\frac{t-1}{2-1}\
+dt=\frac{1}{2}\displaystyle\int_{0}^{2}t^2-t\
+dt=\frac{1}{2}\left(\frac{t^3}{3}-2\frac{t^2}{2}
+\right)\bigg|_{x=0}^{2}=\frac{1}{3}$$
+e quindi 
+$$\displaystyle\int_{a}^{b}f(x)\
+dx\approx\displaystyle\int_{a}^{b}p_2(x)=h
+\displaystyle\sum_{i=0}^{2}f(x_i)W_i=\frac{h}{3}(f(x_0)+4f(x_1)+f(x_2))$$
+
+\begin{figure}[!ht]
+   \centering 
+   \begin{tikzpicture}[scale=1.5]
+       \draw[->] (-0.5,0) -- (4,0) node[right] {$x$};
+       \draw[->] (0,-0.5) -- (0,2.5) node[above] {$y$};
+
+       \draw[domain=0.2:3.8,smooth,variable=\x,blue] plot ({\x},{0.2*(\x-2)^3 + 0.5});
+       \draw[domain=1.2:3.8,variable=\x,red] plot ({\x},{0.6*(\x-1.5)^2 + 0.2});
+
+       \draw[red,thick] (1.5,0) -- (1.5,{0.6*(1.5-1.5)^2 + 0.2});
+       \draw[red,thick] (3.5,0) -- (3.5,{0.6*(3.5-1.5)^2 + 0.2});
+
+       \node[below] at (1.5,-0.15) {$a$};
+       \node[below] at (2.5,-0.15) {$m$};
+       \node[below] at (3.5,-0.15) {$b$};
+   \end{tikzpicture}
+   \caption{Interpolazione quadratica per formula di Simpson}
+\end{figure}
+
+\begin{example}
+    Applichiamo le formule dei Trapezi e di Simpson per il calcolo di
+    $\int_{0}^{1}e^{-x^2}\ dx$, che è un esempio di integrale non risolubile
+    tramite il calcolo della funzione primitiva. Il valore esatto alle prime 6
+    cifre significative è 0.746824.
+
+    Applichiamo la formula dei Trapezi:
+    $$\displaystyle\int_{0}^{1}e^{-x^2}\ dx\approx
+    \frac{h}{2}(e^0+e^{-1})=0.683939.$$
+    Applichiamo la formula di Simpson:
+    $$\displaystyle\int_{0}^{1}e^{-x^2}\ dx\approx
+    \frac{h}{3}(e^0)+4e^{-1/4}+e^{-1}=0.747180.$$
+\end{example}
 \end{document}
