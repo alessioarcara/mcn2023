@@ -2683,7 +2683,11 @@ interpolazione $x_i$.
     Sia $f(x)\in C_{[a,b]}^{(n+1)}$; siano $x_0,x_1,\ldots,x_n\in[a,b]$ punti
     di interpolazione distinti allora esiste un punto $\xi$ che dipende da
     $\bar{x}$ (punto di valutazione) per cui 
-    $$f(\bar{x})=p(\bar{x})+{\color{red}\frac{w(\bar{x})}{(n+1)!}f^{(n+1)}(\xi)}$$
+    \begin{equation}\label{eq:errore_interpolazione}
+        \begin{aligned}
+            f(\bar{x})=p(\bar{x})+{\color{red}\frac{w(\bar{x})}{(n+1)!}f^{(n+1)}(\xi)}
+        \end{aligned}
+    \end{equation}
     con $w(\bar{x})=(\bar{x}-x_0)(\bar{x}-x_1)\cdots(\bar{x}-x_n)$.
 \end{theorem}
 La parte evidenziata in {\color{red}rosso} rappresenta l'errore di interpolazione. Questa
@@ -2707,7 +2711,6 @@ valutazione $\bar{x}$ specifico.
     \begin{center}
         \includegraphics[width=0.4\linewidth]{e_x}
     \end{center}
-
 \end{example}
 \subsubsection{Punti equispaziati e di Chebyshev} Consideriamo la funzione
 $f(x)=\frac{1}{1+x^2}$, definita sull'intervallo $x\in[-5,5]$, 
@@ -2958,9 +2961,10 @@ condizionato.
     che $f$ abbia una primitiva $F:[a,b]\rightarrow \mathbb{R}$. Allora
     $$\displaystyle\int_{a}^{b}f(x)\ dx=F(b)-F(a)=F(x)\big|_{x=a}^b$$
 \end{theorem}
-Questo teorema afferma che il calcolo di un integrale può essere semplificato trovando
-una primitiva della funzione e valutandola agli estremi dell'intervallo.
-È importante notare, però, che non tutte le funzioni possiedono una primitiva. 
+Questo teorema afferma che il calcolo di un integrale può essere semplificato
+trovando una primitiva della funzione e valutandola agli estremi
+dell'intervallo. È importante notare, però, che non tutte le funzioni
+possiedono una primitiva. 
 \begin{example}
    $$\int_{0}^{1}x\ dx=\frac{1}{2}x^2\bigg|_{x=0}^{1}=\frac{1}{2}$$ 
    $$\int_{0}^{1}e^x\ dx=e^x \big|_{x=0}^{1}=e-1$$
@@ -2982,15 +2986,13 @@ eccesso o in difetto, che contribuiscono all'errore rispetto al risultato
 finale.
 $$\displaystyle\int_{a}^{b}f(x)\ dx= \displaystyle\int_{a}^{b}p(x)\
 dx+\text{errore}\approx \displaystyle\int_{a}^{b}p(x)\ dx$$
-\subsection{Formule di quadratura}
-Scegliamo $n+1$ punti di interpolazione $x_i$ distribuiti uniformemente
-nell'intervallo $[a,b]$. Questi punti sono dati da:
-$$x_i=a+ih\quad i=0,\ldots,n\quad\text{con}\quad
-h=\frac{b-a}{n}\quad\text{per}\quad n>0$$
-Successivamente, costruiamo un polinomio
-interpolante $p\in \mathbb{P}_n$ sui punti
-$(x_i,f(x_i))_{i=0,\ldots,n}$. Questo polinomio è espresso nella forma di
-Lagrange:
+\subsection{Formule di quadratura di Newton-Cotes}
+Scegliamo $n+1$ punti di interpolazione $x_i$ \underline{equispaziati}
+nell'intervallo $[a,b]$. Questi punti sono dati da: $$x_i=a+ih\quad
+i=0,\ldots,n\quad\text{con}\quad h=\frac{b-a}{n}\quad\text{per}\quad n>0$$
+Successivamente, costruiamo un polinomio interpolante $p\in \mathbb{P}_n$ sui
+punti $(x_i,f(x_i))_{i=0,\ldots,n}$. Questo polinomio è espresso nella forma
+di Lagrange:
 $$p(x)=\displaystyle\sum_{i=0}^{n}f(x_i)L_{i,n}(x)$$
 Per approssimare l'integrale di $f(x)$ sull'intervallo $[a,b]$, possiamo
 sostituire la funzione integranda $f(x)$ con il polinomio interpolante $p(x)$:
@@ -3010,8 +3012,8 @@ sostituire la funzione integranda $f(x)$ con il polinomio interpolante $p(x)$:
     \end{aligned}
 \end{equation*}
 Questa è la \textbf{formula di quadratura}, una combinazione lineare della
-funzione $f(x)$ pesata dai coefficienti $w_i$.
-Procediamo alla loro integrazione. 
+funzione $f(x)$ pesata dai coefficienti $w_i$. Procediamo alla loro
+integrazione. 
 \begin{equation*}
    \begin{aligned}
        \displaystyle\int_{a}^{b}L_{i,n}(x)\ dx&=\displaystyle\int_{a}^{b}\prod_{j=0,j\neq i}\frac{x-x_j}{x_i-x_j}\
@@ -3026,10 +3028,11 @@ Procediamo alla loro integrazione.
                                               &=h{\color{red}W_i}
    \end{aligned} 
 \end{equation*}
-Notiamo che che i coefficienti $W_i$, dipendono soltanto dal grado $n$ del polinomio interpolante e
-non dalla specifica funzione $f(x)$  da integrare o dall'intervallo $[a,b]$.
-Quindi, una volta calcolati, possono essere utilizzati  per approssimare
-l'integrale di qualsiasi funzione $f(x)$ senza doverli ricalcolare.
+Notiamo che che i coefficienti $W_i$, dipendono soltanto dal grado $n$ del
+polinomio interpolante e non dalla specifica funzione $f(x)$  da integrare o
+dall'intervallo di integrazione. Quindi, una volta calcolati, possono essere
+utilizzati  per approssimare l'integrale di qualsiasi funzione $f(x)$ senza
+doverli ricalcolare.
 \subsubsection{Formula (dei Trapezi) per $n=1$}
 Si procede al calcolo dei $W_i$ per $i=0,1$ (caso $n=1$).
 $$W_0=\displaystyle\int_{0}^{1}\frac{t-1}{0-1}\
@@ -3121,4 +3124,308 @@ dx\approx\displaystyle\int_{a}^{b}p_2(x)=h
     $$\displaystyle\int_{0}^{1}e^{-x^2}\ dx\approx
     \frac{h}{3}(e^0)+4e^{-1/4}+e^{-1}=0.747180.$$
 \end{example}
+\subsubsection{Errore di integrazione}
+\begin{table}[h]
+\centering
+\caption{Errore nell'Integrazione Numerica}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\( n \) & \( \sigma_i \) & \( s \) & \( R \) \\
+\hline
+1 & 1 1 & 2 & \(-\frac{1}{12} h^3 f^{(2)}(\eta)\) \\
+\hline
+2 & 1 4 1 & 3 & \(-\frac{1}{90} h^5 f^{(4)}(\eta)\) \\
+\hline
+3 & 1 3 3 1 & $\frac{8}{3}$ & $-\frac{3}{80}h^5f^{(4)}(\eta)$ \\
+\hline
+4 & 7 32 12 32 7 & $\frac{45}{9}$ & $-\frac{8}{945}h^7f^{(6)}(\eta)$ \\
+\hline
+\end{tabular}
+\end{table}
+\begin{definition} [Grado di precisione di una formula di quadratura]
+    Una formula di quadratura si dice che ha grado di precisione $n$ se
+    fornisce il valore esatto dell'integrale di grado $\leq n$.
+\end{definition}
+Per la formula dei Trapezi, il grado di precisione è 1, mentre per la formula
+di Simpson il grado di precisione è 3.
+\begin{oss}
+    Si osserva che, mentre la formula dei trapezi, come ci si potrebbe
+    aspettare è esatta per polinomi lineari di grado 1, la formula di Simpson
+    rimane esatta non solo per polinomi di grado 2, come ci si
+    aspetterebbe, ma anche per polinomi di grado 3. Questo avviene nonostante
+    il fatto che un polinomio interpolante di grado 2 non dovrebbe, in teoria,
+    essere in grado di rappresentare esattamente il polinomio di grado 3.
+    Tuttavia, gli errori in eccesso e in difetto che si verificano si
+    compensano esattamente, rendendo la formula esatta.
+
+    La chiave sta nelle derivate: la derivata seconda di una funzione lineare
+    è zero, e la derivata quarta di un polinomio di grado 2 o 3 è anche zero,
+    annullando quindi l'errore.
+    \begin{center}
+        \begin{tikzpicture}
+            \begin{axis}[
+                axis lines = middle,
+                xlabel = \(x\),
+                ylabel = \(y\),
+                domain = -1:1,
+                samples = 100,
+                legend pos = north west,
+                ymin = -1,
+                ymax = 1
+                ]
+
+                \addplot[blue, thick, domain=-1:1] {x^3 - x};
+                \addlegendentry{f(x)}
+
+                    \addplot[red, thick, domain=-1:1] {0};
+                    \addlegendentry{p(x)}
+
+                        \addplot[only marks] coordinates {(-1,0) (0,0) (1,0)};
+
+                        \addplot[green, fill=green, opacity=0.3, domain=-1:0] {x^3 - x} \closedcycle;
+                        \addplot[orange, fill=orange, opacity=0.3, domain=0:1] {x^3 - x)} \closedcycle;
+                    \end{axis}
+                \end{tikzpicture}
+            \end{center}
+    Questo comportamento si ha in tutte le formule con $n$ dispari ed $n$ pari
+    rispettivamente.
+\end{oss}
+\begin{theorem}
+    Il grado di precisione delle formule di Newton-Cotes è $n$ se $n$ è
+    dispari, è $n+1$ se $n$ è pari.
+\end{theorem}
+Per $n\geq8$, le formule diventano instabili a causa dei
+coefficienti di \underline{segno diverso} e dell'aumento del loro valore
+assoluto che portano a problemi di cancellazione numerica e
+perdita di precisione. Di conseguenza, si rende necessaria la ricerca di
+formule più stabili e precise.
+\subsection{Formule di quadratura composite}
+Le formule composte consistono nel considerare dei polinomi a tratti come
+funzioni approssimanti della funzione integranda nell'intervallo $[a,b]$.
+$$\displaystyle\int_{a}^{b}f(x)\ dx\approx \displaystyle\int_{a}^{b}pp_1(x)\
+dx$$
+In pratica tale intervallo viene suddiviso in sottointervalli di
+\underline{uguale ampiezza} ($h=\frac{b-a}{m}$), $[x_i,x_{i+1}]\
+i=0,\ldots,m-1$, e su ciascuno di essi si applica una formula di quadratura.
+La formula di quadratura composita è data dalla somma degli integrali
+calcolati su tutti gli intervalli.
+$$\displaystyle\int_{a}^{b}f(x)\ dx\approx \displaystyle\sum_{i=0}^{m-1}
+\displaystyle\int_{x_i}^{x_{i+1}}p_{n}(x)\ dx$$
+Al variare di $n$ abbiamo le varie formule composite:
+\begin{itemize}
+    \item \textbf{Formula dei Trapezi composita}:
+
+            $\displaystyle\sum_{i=0}^{m-1}\displaystyle\int_{x_i}^{x_{i+1}}p_1(x)\
+                dx=h(\frac{1}{2}f(x_0)+f(x_1)+\ldots+f(x_{m-1})+\frac{1}{2}f(x_m))+R_{TC}$
+                \begin{center}
+                    \includegraphics[width=0.4\linewidth]{tc_1.jpeg}
+                \end{center}
+                Dove $R_{TC}$ è definito come segue:
+                \begin{equation}\label{eq:error_tc}
+                   \begin{aligned}
+                       R_{TC} &= -
+                       \frac{h^3}{12}\displaystyle\sum_{i=0}^{m-1}f^{(2)}(\eta_i)
+                              & \eta_i\in(x_i,x_{i+1})\\ 
+                              \alignedintertext{Sostituendo $h=\frac{b-a}{m}$,
+                              l'errore diventa:}
+                              &=
+                              -\frac{h^2}{12}(\frac{b-a}{\color{red}{m}}){\color{red}\displaystyle\sum_{i=0}^{m-1}f^{(2)}(\eta_i)}\\
+                              \alignedintertext{La parte in
+                              {\color{red}rosso} rappresenta una media dei
+                          valori delle derivate seconde da 0 a $m-1$.
+                          Utilizzando il \textsc{Teorema del valor medio}, questo termine è uguale alla
+                  derivata seconda valutata in un opportuno punto $\eta$
+              nell'intervallo $(a,b)$. Pertanto, possiamo riscrivere $R_{TC}$
+          come segue:} \\ 
+                             &= - \frac{b-a}{12}h^2f^{(2)}(\eta) & \eta
+                             \in(a,b)
+                   \end{aligned} 
+                \end{equation}
+                Poiché $h=\frac{b-a}{m}$, man mano che $m$ aumenta, $h$ diventa più
+                piccolo, migliorando la precisione dell'integrale e riducendo
+                l'errore. 
+                $$R_{TC}\underset{m\to\infty}{\to}0$$
+                Un vantaggio chiave dell'uso delle formule di
+                quadratura composte, è proprio questo incremento di precisione
+                quando si aumenta il numero di sottointervalli $m$. 
+    \item \textbf{Formula di Simpson composita}:
+        se prendiamo $m=2k$ l'intervallo $[a,b]$ viene diviso in un numero
+        pari di sottointervalli. Ogni sottointervallo è delimitato dai punti
+        $[x_{2i},x_{2i+2}]$ e include tre punti distinti. In questo modo,
+        possiamo utilizzare la formula di Simpson per calcolare l'integrale in ogni
+        sottointervallo.
+        \begin{center}
+            \includegraphics[width=0.5\linewidth]{sc_1}
+        \end{center}
+
+        $\displaystyle\sum_{i=0}^{k-1}\displaystyle\int_{x_{2i}}^{x_{2i+1}}p_2(x)\
+        dx=\frac{h}{3}(f(x_0)+4f(x_1)+2f(x_2)+4f(x_3)+\ldots+f(x_m))+R_{SC}$
+
+        Dove $R_{SC}$ è definito come segue:
+        \begin{equation}\label{eq:error_sc}
+           \begin{aligned}
+               R_{SC}&=-\frac{h^5}{90}\displaystyle\sum_{i=0}^{k-1}f^{(4)}(\eta_i)
+                     & \eta_i(x_{2i},x_{2i+1})
+               \\ 
+               \alignedintertext{Per le stesse argomentazione usate per la
+               formula dei trapezi, questo si può scrivere:}\\
+                     &=-\frac{h^4}{90}\frac{b-a}{{\color{red}2k}}{\color{red}\displaystyle\sum_{i=0}^{k-1}f^{(4)}(\eta_i)}\\
+                     &=-\frac{b-a}{180}h^4f^{(4)}(\eta) & \eta\in(a,b)
+           \end{aligned} 
+        \end{equation}
+        In questo caso, il valore di $h$ converge più rapidamente rispetto al
+        metodi dei Trapezi composito quando si aumenta $m$.
+\end{itemize}
+\begin{example}
+    Dato l'integrale
+   $$\displaystyle\int_{0}^{1}\frac{1}{1+x}\ dx$$
+   il cui valore esatto è 0.693147.
+
+   Calcolare il valore approssimato dell'integrale e l'errore $R$ utilizzando sia la formula
+   dei Trapezi composita che la formula di Simpson composita.
+    
+   \begin{center}
+       \begin{tabular}{|r|c|c|c|c|}
+           \hline
+           \( h \) & \( T(h) \) & \( R_{\text{TC}} \) & \( S(h) \) & \( R_{\text{SC}} \) \\
+           \hline
+           \( h \)=1 & 0.75 & 0.0568 & - & - \\
+           \( h/2 \)=0.5 & 0.708  & 0.01518  & 0.6944 &  0.00129 \\
+           \( h/4 \)=0.25 &  0.697 & 0.0038  & 0.6932  & 0.000107 \\
+           \( h/8 \)=0.125 &  0.694 & 0.0097  & 0.69315 & 0.00009 \\
+           \hline
+       \end{tabular}
+   \end{center}
+
+   Come visto precedentemente, l'errore \( R_{\text{TC}} \) nel metodo dei
+   Trapezi composito è proporzionale a \( h^2 \), mentre l'errore \(
+   R_{\text{SC}} \) nel metodo di Simpson composito è proporzionale a \( h^4
+   \). Effettivamente, nell'esempio questo è confermato: il rapporto di
+   riduzione dell'errore nel metodo dei Trapezi è di un fattore 4, mentre nel
+   metodo di Simpson è di un fattore 16 quando \( h \) viene dimezzato.
+\end{example}
+\begin{example}
+   Determinare il passo $h$ da utilizzare nella formula dei Trapezi composita
+   e nella formula di Simpson composita, affinché
+   l'integrale $\displaystyle\int_{0}^{1}\frac{1}{1+x}\ dx$ sia approssimato alla
+   tolleranza $0.5\times 10^{-3}$.
+   \vskip 0.1in
+   Si considera la formula \ref{eq:error_tc} per l'errore di integrazione dei
+   Trapezi composita e si cerca un limite superiore per la $f^{(2)}$ in
+   $[a,b]$; nel caso specifico sarà:
+   \begin{equation*} 
+       \begin{aligned}
+           & f'(x)=(1+x)^{-1} & f^{''}(x)=2(1+x)^{-3}
+       \end{aligned}
+   \end{equation*}
+   Allora 
+   $$\max_{0\leq x\leq 1}f^{''}(x)=f^{''}(0)=2$$
+   e ricordando che $h=\frac{b-a}{2k}$ si ha:
+   $$\left\lvert\frac{b-a}{12}h^2f^{''}(\eta) \right\lvert\leq 
+           \frac{1}{\cancel{12}\
+           6}h^2\cancel{2}=\frac{1}{6}\frac{1}{4k^2}=\frac{1}{24k^2}\leq 0.5\times10^{-3}$$
+   da cui 
+   $$k^2\geq \frac{2}{24}\times 10^3\quad \text{e quindi }k\geq9.12$$
+   Segue che per approssimare l'integrale dato alla tolleranza fissata con il
+   metodo dei Trapezi composito è sufficiente usare $k=10$, cioè il più
+   piccolo intero che soddisfa $k\geq 9.12$.
+   \vskip 0.1in
+   Si considera la formula \ref{eq:error_sc} per l'errore di integrazione di
+   Simpson composita e si cerca un limite superiore per la $f^{(4)}$ in
+   $[a,b]$; nel caso specifico sarà:
+   \begin{equation*} 
+       \begin{aligned}
+           & f^{(3)}(x)=6(1+x)^{-4} & f^{(4)}(x)=24(1+x)^{-5}
+       \end{aligned}
+   \end{equation*}
+   Allora 
+   $$\max_{0\leq x\leq 1}f^{(4)}(x)=f^{(4)}(0)=24$$
+   si ha:
+   $$\left\lvert\frac{b-a}{180}h^4f^{(4)}(\eta) \right\lvert\leq 
+       \frac{1}{\cancel{180}\ 15}h^4 \cancel{24}\ 2=\frac{2}{15}\frac{1}{16k^4}=\frac{1}{120k^4}\leq 0.5\times10^{-3}$$
+   da cui 
+   $$k^4\geq \frac{2}{120}\times 10^3\quad \text{e quindi }k\geq2.0205$$
+   Segue che per approssimare l'integrale dato alla tolleranza fissata con il
+   metodo di Simpson composita è sufficiente usare $k=3$, cioè il più
+   piccolo intero che soddisfa $k\geq 2.0205$.
+\end{example}
+\subsection{Metodi adattivi}
+Si desidera che la differenza tra l'integrale esatto
+$\displaystyle\int_{a}^{b}f(x)\ dx$ e la sua approssimazione $I_A$ sia
+contenuta entro una certa tolleranza $tol$. 
+$$\left\lvert \displaystyle\int_{a}^{b}f(x)\ dx- I_A\right\rvert\leq tol$$
+Purtroppo, quando non si conosce il valore esatto dell'integrale, quanto visto
+fino ad ora non permette di soddisfare questa richiesta.
+
+Nella prossima sezione vedremo una tecnica nota come estrapolazione di
+Richardson che permette di stimare numericamente l'errore di integrazione.
+\subsubsection{Estrapolazione di Richardson}
+Con \textbf{estrapolazione di Richardson} ci si riferisce ad una tecnica che
+permette di ottenere dall'applicazione di due formule di integrazione composte
+con passi rispettivamente $h$ ed $\frac{h}{2}$ un valore di approssimazione
+per l'integrale più preciso dei due precedenti. Vediamo questa tecnica nel
+caso delle formule composite:
+\begin{itemize}
+    \item \textbf{Caso Trapezi} 
+    \begin{corollary}
+        Assumendo che la $f(x)$sia derivabile almeno 4 volte su $[a,b]$, si
+        ha:
+        $${\color{red}\displaystyle\int_{a}^{b}f(x)\ dx-T(h/2)\approx
+        \frac{T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
+        da cui 
+        $${\color{green}\displaystyle\int_{a}^{b}f(x)\ dx\approx
+        \frac{4T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
+    \end{corollary} 
+    \begin{oss}\leavevmode\
+        \begin{itemize}
+            \item[{\color{green}*}]\textbf{Miglioramento della stima}. Questo metodo consente di eliminare la potenza più bassa (2) 
+                combinando opportunamente $T(h)$e $T(h/2)$, al fine di ottenere un'approssimazione
+                più precisa dell'integrale.
+            \item[{\color{red}*}]\textbf{Stima dell'errore}. Inoltre, il corollario fornisce una stima
+                del termine principale dell'errore e quindi fornisce un metodo
+                pratico per raggiungere l'obiettivo che si è posti. Si può
+                progettare un metodo iterativo in cui si dimezza il passo fino
+                a che 
+                \begin{equation}\label{eq:stima_errore_integrazione}
+                    \left\lvert \frac{T(h/2)-T(h)}{3}\right\rvert\leq tol
+                \end{equation} 
+                quando questo si verifica, per il corollario, sarà anche 
+                $$\left\lvert \displaystyle\int_{a}^{b}f(x)\
+                dx-T(h/2)\right\rvert\leq tol$$
+                e avremo una buona integrazione con $T(h/2)$. Questo metodo
+                iterativo può essere applicato in modo adattivo. 
+        \end{itemize}
+        
+    \end{oss}
+\end{itemize}
+In un approccio adattivo il numero di punti viene scelto in base alla
+regolarità della funzione. Si suddivide l'intervallo di integrazione,
+\underline{solo dove serve}, in sottointervalli e si applica ricorsivamente a
+questi una formula di quadratura sfruttando la stima dell'errore di
+integrazione \ref{eq:stima_errore_integrazione} per il test di arresto. La
+funzione integranda viene così valutata in pochi punti nei sottointervalli in
+cui ha un andamento regolare e in molti punti negli intervalli dove sono
+presenti irregolarità.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{adaptive}
+    \caption{Metodo adattivo con controllo dell'errore che ci permette di
+    calcolare il valore approssimato dell'integrale della funzione alla
+tolleranza fissata suddividendo solo dove serve}
+\end{figure}
+\begin{lstlisting}[language=Python]
+def trap_adapt(fn, a, b, fa, fb, tol, tab):
+    m = 0.5 * (a + b)
+    fm = fn(m)
+    
+    tam = trap_sing(a, m, fa, fm)
+    tmb = trap_sing(m, b, fm, fb)
+    
+    if math.fabs(tab - tam - tmb) / 3 < tol:
+        return (4 * (tam + tmb) - tab) / 3  # Estrapolazione di Richardson
+    else:
+        return (trap_adapt(fn, a, m, fa, fm, 0.5 * tol, tam) + 
+                trap_adapt(fn, m, b, fm, fb, 0.5 * tol, tmb))
+\end{lstlisting}
 \end{document}
