@@ -3365,39 +3365,36 @@ permette di ottenere dall'applicazione di due formule di integrazione composte
 con passi rispettivamente $h$ ed $\frac{h}{2}$ un valore di approssimazione
 per l'integrale più preciso dei due precedenti. Vediamo questa tecnica nel
 caso delle formule composite:
-\begin{itemize}
-    \item \textbf{Caso Trapezi} 
-    \begin{corollary}
-        Assumendo che la $f(x)$sia derivabile almeno 4 volte su $[a,b]$, si
-        ha:
-        $${\color{red}\displaystyle\int_{a}^{b}f(x)\ dx-T(h/2)\approx
-        \frac{T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
-        da cui 
-        $${\color{green}\displaystyle\int_{a}^{b}f(x)\ dx\approx
-        \frac{4T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
-    \end{corollary} 
-    \begin{oss}\leavevmode\
-        \begin{itemize}
-            \item[{\color{green}*}]\textbf{Miglioramento della stima}. Questo metodo consente di eliminare la potenza più bassa (2) 
-                combinando opportunamente $T(h)$e $T(h/2)$, al fine di ottenere un'approssimazione
-                più precisa dell'integrale.
-            \item[{\color{red}*}]\textbf{Stima dell'errore}. Inoltre, il corollario fornisce una stima
-                del termine principale dell'errore e quindi fornisce un metodo
-                pratico per raggiungere l'obiettivo che si è posti. Si può
-                progettare un metodo iterativo in cui si dimezza il passo fino
-                a che 
-                \begin{equation}\label{eq:stima_errore_integrazione}
-                    \left\lvert \frac{T(h/2)-T(h)}{3}\right\rvert\leq tol
-                \end{equation} 
-                quando questo si verifica, per il corollario, sarà anche 
-                $$\left\lvert \displaystyle\int_{a}^{b}f(x)\
-                dx-T(h/2)\right\rvert\leq tol$$
-                e avremo una buona integrazione con $T(h/2)$. Questo metodo
-                iterativo può essere applicato in modo adattivo. 
-        \end{itemize}
-        
-    \end{oss}
-\end{itemize}
+\paragraph{Caso Trapezi.} 
+\begin{corollary}
+    Assumendo che la $f(x)$sia derivabile almeno 4 volte su $[a,b]$, si
+    ha:
+    $${\color{red}\displaystyle\int_{a}^{b}f(x)\ dx-T(h/2)\approx
+    \frac{T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
+    da cui 
+    $${\color{green}\displaystyle\int_{a}^{b}f(x)\ dx\approx
+    \frac{4T(h/2)-T(h)}{3}+\mathcal{O}(h^4)}$$
+\end{corollary} 
+\begin{oss}\leavevmode\
+    \begin{itemize}
+        \item[{\color{green}*}]\textbf{Miglioramento della stima}. Questo metodo consente di eliminare la potenza più bassa (2) 
+            combinando opportunamente $T(h)$e $T(h/2)$, al fine di ottenere un'approssimazione
+            più precisa dell'integrale.
+        \item[{\color{red}*}]\textbf{Stima dell'errore}. Inoltre, il corollario fornisce una stima
+            del termine principale dell'errore e quindi fornisce un metodo
+            pratico per raggiungere l'obiettivo che si è posti. Si può
+            progettare un metodo iterativo in cui si dimezza il passo fino
+            a che 
+            \begin{equation}\label{eq:stima_errore_integrazione}
+                \left\lvert \frac{T(h/2)-T(h)}{3}\right\rvert\leq tol
+            \end{equation} 
+            quando questo si verifica, per il corollario, sarà anche 
+            $$\left\lvert \displaystyle\int_{a}^{b}f(x)\
+            dx-T(h/2)\right\rvert\leq tol$$
+            e avremo una buona integrazione con $T(h/2)$. Questo metodo
+            iterativo può essere applicato in modo adattivo. 
+    \end{itemize}
+\end{oss}
 In un approccio adattivo il numero di punti viene scelto in base alla
 regolarità della funzione. Si suddivide l'intervallo di integrazione,
 \underline{solo dove serve}, in sottointervalli e si applica ricorsivamente a
@@ -3406,7 +3403,6 @@ integrazione \ref{eq:stima_errore_integrazione} per il test di arresto. La
 funzione integranda viene così valutata in pochi punti nei sottointervalli in
 cui ha un andamento regolare e in molti punti negli intervalli dove sono
 presenti irregolarità.
-
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{adaptive}
@@ -3428,4 +3424,40 @@ def trap_adapt(fn, a, b, fa, fb, tol, tab):
         return (trap_adapt(fn, a, m, fa, fm, 0.5 * tol, tam) + 
                 trap_adapt(fn, m, b, fm, fb, 0.5 * tol, tmb))
 \end{lstlisting}
+\paragraph{Caso Simpson.} 
+Calcolando un Simpson con passo $h=\frac{b-a}{2}$ ($S(h)$) e
+un Simpson con passo $h/2=\frac{b-a}{4}$ ($S(h/2)$); avremo la seguente
+formula che fornisce un'approssimazione dell'integrale d'ordine
+superiore:
+$$ {\color{red}\left\lvert \displaystyle\int_{a}^{b}f(x) - S(h/2)\ dx\right\rvert
+\approx \left\lvert \frac{1}{15}[S(h/2)-S(h)]\right\rvert}$$
+da questa relazione, possiamo ottenere un'approssimazione migliore
+dell'integrale come segue:
+$${\color{green}\displaystyle\int_{a}^{b}f(x)\ dx\approx
+\frac{1}{15}[16\cdot S(h/2)-S(h)]}$$
+Utilizzando la {\color{red} prima relazione} possiamo implementare un
+procedimento iterativo in cui il passo viene dimezzato fino a quando
+la seguente condizione è soddisfatta: 
+$$\left\lvert \frac{1}{15}[S(h/2)-S(h)]\leq tol\right\rvert$$
+Una volta soddisfatta questa condizione, avremo che:
+$$\left\lvert \displaystyle\int_{a}^{b}f(x)\ dx -
+S(h/2)\right\rvert\leq tol$$
+Di seguito il metodo adattivo per Simpson:
+\begin{lstlisting}[language=Python]
+def simp_adapt(fn, a, m, b, fa, fm, fb, tol, sab):
+    m1 = 0.5*(a+m)
+    m2 = 0.5*(m+b)
+    fm1 = fn(m1)
+    fm2 = fn(m2)
+    sam = simp_sing(a, m, fa, fm1, fm)
+    smb = simp_sing(m, b, fm, fm2, fb)
+    
+    if math.fabs(sab - sam - smb) / 15 < tol:
+        return (16*(sam+smb) - sab)/15 # Estrapolazione di Richardson
+    else:
+        return (simp_adapt(fn, a, m1, m, fa, fm1, fm, 0.5*tol, sam) + 
+                simp_adapt(fn, m, m2, b, fm, fm2, fb, 0.5*tol, smb)) 
+\end{lstlisting}
+\newpage
+\section{Equazioni non lineari}
 \end{document}
