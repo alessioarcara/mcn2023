@@ -292,7 +292,7 @@ vengono utilizzati due valori speciali:
 \end{itemize}
 Invece, di avere un buco vicino allo zero dove i numeri molto piccoli
 verrebbero immediatamente arrotondati a zero, vengono inseriti dei numeri ulteriori per
-riempire questo buco e permettere ai valori di avvicinarsi progressivamente a zero.
+riempire questo vuoto e permettere ai valori di avvicinarsi progressivamente a zero.
 Questo meccanismo è chiamato \textbf{gradual underflow}.\\ 
 Per rappresentare questi numeri estremamente piccoli, si fa uso della
 rappresentazione \textbf{denormalizzata}. In questa rappresentazione, la
@@ -441,7 +441,7 @@ misura dell'errore ``normalizzata'', che non dipende dalla grandezza dei numeri 
 \end{definition}
 \begin{theorem}
    Per ogni $\alpha\in \mathbb{R}$ e $\alpha\notin0$ vale
-   $$\Big\lvert \frac{\alpha-fl(\alpha)}{\alpha}\Big\rvert=u$$
+   $$\Big\lvert \frac{\alpha-fl(\alpha)}{\alpha}\Big\rvert<u$$
 \end{theorem}
 Il teorema afferma che $u$, l'unità di arrotondamento, rappresenta il
 \underline{limite superiore} dell'errore relativo quando si rappresenta 
@@ -551,7 +551,7 @@ $\alpha$ e $fl(\alpha)$ è minore dell'unità di arrotondamento $u$. Questo
 significa che $u$ rappresenta l'errore relativo massimo che possiamo
 aspettarci in una singola operazione in aritmetica finita.
 Estendendo questa logica, se effettuiamo una serie di $n$ operazioni, l'errore
-totale potrebbe essere al più $nu$.
+totale potrebbe essere al più $n\cdot u$.
 $$\Big\lvert \frac{\overset{fl(\alpha)}{\overbrace{(a\ \tilde{op}\ b)}}-\overset{\alpha}{\overbrace{(a\ op\
 b)}}}{\underset{\alpha}{\underbrace{a\ op\ b}}}\Big\rvert<u$$
 \paragraph{Proprietà associativa.} La proprietà associativa afferma che
@@ -699,7 +699,7 @@ problema su un calcolatore:
 Per valutare l'entità dell'errore, possiamo utilizzare:
 \begin{itemize}
     \item\textbf{Analisi in avanti}: si calcola l'errore relativo sul
-        sul risultato finale in termini degli errori introdotti dalle singole
+        risultato finale in termini degli errori introdotti dalle singole
         operazioni, trascurando i termini in cui compaiono prodotti di errori
         (analisi del $1^{\circ}$ ordine).
     \item\textbf{Analisi all'indietro}: approccio opposto al precedente
@@ -1340,7 +1340,7 @@ inerente durante i calcoli.
 \end{oss}
 \begin{theorem}[fondamentale dell'algebra]
     Sia $p(x)$ un polinomio di grado $n  \geq$ 1. Allora, $p(x)$ ha 
-    esattamente $n$ radici reali o complesse, contate con la sua
+    esattamente $n$ radici reali o complesse, ciascuna contata con la sua
     molteplicità. Ciò significa che $p(x)=0$ può essere riscritto come:
     \begin{equation}
         \begin{aligned} \label{eq:teorema_divisione_polinomi}
@@ -1412,7 +1412,7 @@ costo asintotico $\mathcal{O}(n)$. Ancora, possiamo fare meglio?
 Richiamando il teorema \ref{eq:teorema_divisione_polinomi} sulla divisione di
 due polinomi, nel caso particolare in cui il polinomio divisore sia il
 binomio $(x-\bar{x})$ per un assegnato valore reale $\bar{x}$, si ha che
-esistono unici i polinomi $q(x)$ ed $r(x)$ per cui 
+esistono i polinomi unici $q(x)$ ed $r(x)$ per cui 
 $$p(x)=q(x)(x-\bar{x})+r(x)$$
 e poiché $r(x)$ deve essere di grado inferiore a quello di $(x-\bar{x})$ sarà
 una costante che indicheremo con $r$.
@@ -3460,4 +3460,304 @@ def simp_adapt(fn, a, m, b, fa, fm, fb, tol, sab):
 \end{lstlisting}
 \newpage
 \section{Equazioni non lineari}
+Si considera  il problema di trovare le radici di una funzione non
+lineare, ovvero risolvere $f(x)=0$. 
+Geometricamente, questo equivale a trovare i punti in cui la funzione $f(x)$
+interseca l'asse delle ascisse (gli zero della funzione). 
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines = middle,
+            xlabel = \(x\),
+            ylabel = {\(f(x)\)},
+            samples = 100,
+            domain = -3:3,
+            ]
+            \addplot[blue, thick] {x^2 - 1};
+            \addplot[only marks, red] coordinates {(-1, 0) (1, 0)};
+        \end{axis}
+    \end{tikzpicture} 
+\end{center}
+
+Per equazioni con grado $n\leq 4$, esistono soluzioni analitiche che
+permettono di determinare le radici in modo esatto. Tuttavia, per equazioni di
+grado superiore, non esistono soluzioni analitiche esplicite.
+
+In questi casi, si ricorre a metodi numerici per approssimare le radici della
+funzione.
+\subsection{Metodo di bisezione}
+Per poter applicare questo metodo la funzione $f(x)$ con $x\in[a,b]$ deve
+rispettare le seguenti condizioni:
+\begin{enumerate}
+    \item \textbf{Continuità della funzione}: la funzione $f(x)$ deve essere
+        continua nell'intervallo.
+        $$f\in C[a,b]$$
+    \item \textbf{Segno opposto agli estremi}: la funzione deve avere segni
+        opposti agli estremi dell'intervallo $a$ e $b$.
+        $$f(a)\cdot f(b)<0$$
+\end{enumerate}
+Se entrambe queste condizioni sono soddisfatte, allora esiste almeno un valore
+$z$ nell'intervallo $(a,b)$ per cui $f(z)=0$.
+
+Il metodo procede suddividendo ripetutamente l'intervallo $[a,b]$ a metà,
+calcolando il punto medio $m$. Successivamente, si verifica quale dei due
+nuovi intervalli $[a,m]$ o $[m,b]$ soddisfa la condizione per contenere $x^*$.
+In particolare, se $f(a)f(m)<0$ allora $x^*\in[a,m]$; altrimenti
+$x^*\in[m,b]$. L'intervallo scelto diventa il nuovo $[a,b]$, creando una
+successione di intervalli $[a_k, b_k]$ per $k=1,\ldots,m$. Il procedimento
+viene iterato sull'intervallo che è risultato contenere $x^*$ e viene
+arrestato quando l'ampiezza dell'intervallo in esame risulterà minore di una
+prefissata tolleranza $tol$.
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{bisection}
+\end{center}
+\begin{oss}\leavevmode\\
+    Il valore di $tol$ non può essere scelto arbitrariamente piccolo, poiché 
+    lavorando con numeri finiti la condizione di arresto
+    $$\frac{\left\lvert b_k-a_k\right\rvert}{\min(\left\lvert
+    a_k\right\rvert, \left\lvert b_k\right\rvert)}<tol$$
+    potrebbe non essere mai soddisfatta. Poiché $a_k$ e $b_k$ sono numeri
+    finiti, la loro distanza non sarà mai esattamente zero. Se la tolleranza
+    $tol$ viene impostata a un valore minore della distanza tra $a_k$ e $b_k$
+    il metodo potrebbe non convergere. 
+
+    Si può dimostrare che la distanza relativa tra due numeri finiti
+    consecutivi $X$ e $Y$ è data da 
+    $$\frac{Y-X}{X}=2u$$
+    Ne consegue che $tol$ deve essere maggiore di $2u$.
+
+    Per evitare la divisione per zero quando $a_k$ o $b_k$ sono uguali a zero,
+    il test di arresto può essere riformulato come segue:
+    $$\left\lvert b_k-a_k\right\rvert < 2u\cdot \min(\left\lvert
+    a_k\right\rvert,\left\lvert b_k\right\rvert)+tol$$
+    dove ora $tol$ può essere scelto arbitrariamente e il problema della
+    divisione per zero è evitato.
+\end{oss}
+\begin{oss}
+    Se $x^*\equiv 0$ sarà sempre $a_k<0$ e $b_k>0$ per cui 
+    $$\frac{\left\lvert b_k-a_k\right\rvert}{\min(\left\lvert
+    a_k\right\rvert,\left\lvert b_k\right\rvert)}>1$$
+    per evitare questo caso basta controllare se $f(0)\equiv 0$ quando
+    $a<0<b$.
+\end{oss}
+\begin{lstlisting}[language=Python]
+def bisez(fn, a, b, tol):
+    if a<0 and b>0 and fn(0) == 0:
+        return 0
+    while abs(b-a) > 2*u*(min(abs(a), abs(b)))+tol:
+        m = (a+b) / 2
+        fm = fn(m)
+        if fn(a)*fm < 0:
+            b=m
+        else:
+            a=m
+    return (a+b)/2 
+\end{lstlisting}
+Tuttavia, il metodo di bisezione presenta lo svantaggio di essere lento. In
+particolare, ad ogni iterazione, l'approssimazione della radice migliora
+soltanto di un bit. Considerando una precisione di tipo double, che dispone di una
+mantissa di 53 cifre, sarebbero necessarie 53 iterazione per raggiungere
+l'approssimazione desiderata della radice. 
+
+Il problema del metodo di bisezione è che utilizza solo una frazione delle
+informazioni disponibili. Nello specifico, si limita a considerare solamente
+il segno della funzione agli estremi dell'intervallo in esame. Fortunatamente,
+esistono metodi che superano questa limitazione, sfruttando informazioni
+addizionali come il valore effettivo della funzione agli estremi, per
+accelerare il processo di convergenza.
+\subsubsection{Metodo della falsa posizione}
+\begin{wrapfigure}{r}{0.4\textwidth}
+    \includegraphics[width=0.9\linewidth]{false_position}
+\end{wrapfigure}
+Nel metodo della falsa posizione, si interpola una retta tra i punti $(a,f(a))$
+e $(b,f(b))$ e si trova il punto $y$ in cui questa retta interseca l'asse $x$
+tramite la formula:
+$$y=b-\frac{f(b)(b-a)}{f(b)-f(a)}$$
+Successivamente, si verifica quale dei due nuovi intervalli, $[a,y]$ o
+$[y,b]$, soddisfa la condizione per contenere $x*$. Si sostituisce uno degli
+estremi con $y$ e si continua iterativamente.
+
+A differenza del metodo di bisezione, non stiamo rimpicciolendo gli intervalli
+ma abbiamo che uno dei due estremi si avvicina sempre di più alla soluzione
+$x^*$. Formalmente, avremo una successione $x_k$ con $k=0,\ldots,n$ di estremi
+tale che:
+$$x_k\underset{k\to\infty}{\to} x^*$$
+Il test d'arresto delle falsi posizioni è diverso da quello del metodo della
+bisezione. Si calcola la differenza relativa tra due iterative successive $x_k$ e
+$x_{k-1}$ e confrontarla con la tolleranza desiderata:
+$$\frac{\left\lvert x_k-x_{k-1}\right\rvert}{\min(\left\lvert
+x_{k-1}\right\rvert, \left\lvert x_k\right\rvert)} < tol$$
+e, come prima: 
+$$\left\lvert x_k-x_{k-1}\right\rvert<2u\cdot\min(\left\lvert x_k\right\rvert,
+\left\lvert x_{k-1}\right\rvert)+tol$$
+Quindi, il metodo converge in molti meno passi rispetto al metodo di
+bisezione.
+\newpage
+\begin{lstlisting}[language=Python]
+def false_position(fn, a, b, tol):
+    prev_y = None
+    fa = fn(a)
+    fb = fn(b)
+    while True:
+        y = b - (fb * (b - a)) / (fb - fa)
+        if prev_y is not None and abs(y-prev_y) < 2*u*(min(abs(y),abs(prev_y)))+tol:
+            return y
+        fy = fn(y)
+        if fa*fy < 0:
+            b=y
+            fb=fy
+        else:
+            a=y
+            fa=fy
+        prev_y = y
+\end{lstlisting}
+\subsection{Metodo di Newton}
+Supponiamo di avere una funzione $f\in C^2[a,b]$ e di conoscere un punto $\bar{x}\in[a,b]$ che
+sia un'approssimazione della soluzione $x^*$ tale che $f'(\bar{x})\neq 0$ e
+che $\left\lvert \bar{x}-x^*\right\rvert$ sia piccolo.
+
+Partiamo da uno sviluppo di Taylor centrato in $\bar{x}$:
+$$f(x)=f(\bar{x})+f'(\bar{x})(x-\bar{x})+f''(\bar{x})\left(\frac{x-\bar{x}}{2}\right)^2+\ldots$$
+Valutiamo $x^*$, usando lo sviluppo di Taylor:
+$$\underbrace{f(x^*)}_{0}=f(\bar{x})+f'(\bar{x})(x^*-\bar{x})+f''(\bar{x})\left(\frac{x^*-\bar{x}}{2}\right)$$
+Poiché $\left\lvert \bar{x} - x^*\right\rvert$ si è assunto piccolo,
+$(x^*-\bar{x})^2$ sarà ancora più piccolo e ancora di più i termini
+successivi; trascurando allora i termini non lineari abbiamo:
+$$0=f(\bar{x})+f'(\bar{x})(x^*-\bar{x})$$
+Risolvendo per $x^*$ otteniamo: 
+$${\color{red}x^*-\frac{f(\bar{x})}{f'(\bar{x})}}$$
+Questa relazione fornisce l'idea per il \textbf{metodo di Newton}, che
+consiste nel generare una successione $\left\{x_k\right\}$ definita da:
+\begin{equation}
+    \begin{aligned}
+        & x_{k+1}=x_k-\frac{f(x_k)}{f'(x_k)} &\text{con } k\geq0\text{ e
+        }f'(x_k)\neq0\ \forall k.
+    \end{aligned}
+\end{equation}
+Geometricamente, indica che ogni nuovo iterato $x_{k+1}$ è dato
+dall'intersezione fra la retta tangente $f'(x_k)$,  alla $y=f(x_k)$ nel punto $x_k$ 
+e l'asse $x$.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[scale=1]
+        \begin{axis}[
+            axis lines = middle,
+            xlabel = \( x \),
+            ylabel = \( f(x) \),
+            domain = 0:5,
+            ymax = 10,
+            xtick=\empty,
+            ytick=\empty,
+            samples = 100,
+            ]
+            \addplot[black, thick, no marks] {x^2 - 4};
+            \addplot[blue, domain=1:4] {2*3*(x - 3) + (3)^2 - 4};
+
+            \addplot[red, mark = *, only marks] coordinates {(3, 5) (2.166666, 0)};
+
+            \node[below] at (axis cs: 3, 0) { \( x_k \) };
+            \node[below] at (axis cs: 2.166666, 0) { \( x_{k+1} \) };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Iterazione del metodo di Newton}
+\end{figure}
+
+Per verificare la convergenza della successione
+$\left\{x_k\right\}_{k=0,1,\ldots}$, consideriamo una famiglia più generale di
+metodi, di cui il metodo di Newton è un caso particolare. Questa famiglia di
+metodi è nota come metodi di iterazione funzionale e sono descritti dalla
+seguente formula
+\begin{equation}\label{eq:metodo_iterazione_funzionale}
+  \begin{aligned}
+      & x_{k+1}=g(x_k) & k=0,1,\ldots
+  \end{aligned}  
+\end{equation}
+Tali metodi risolvono un problema diverso: trovare le soluzioni dell'equazione 
+$$x=g(x)$$
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{functional_iteration}
+\end{center}
+Ciò significa trovare i punti di intersezione tra la retta bisettrice $y=x$ e
+la curva $y=g(x)$. Questi sono detti \textbf{punti fissi} di $g(x)$, cioè i punti in cui la funzione
+assume lo stesso valore dell'argomento.
+
+Se $g(x)=x-\frac{f(x)}{h(x)}$ con $h(x)\neq0$, allora i due problemi sono
+equivalenti e le radici di $f(x)=0$ sono anche i punti fissi di $g(x)$ e
+viceversa.
+\begin{proof}\leavevmode\
+    \begin{itemize}
+        \item Sia $f(x^*)=0$. Allora abbiamo
+            \begin{equation*}
+               \begin{aligned}
+                   g(x^*)&=x^*-\frac{\overbrace{f(x^*)}^0}{h(x^*)}\\ 
+                         &=x^*
+               \end{aligned} 
+            \end{equation*}
+            il che implica che $x^*$ è un punto fisso d $g(x)$.
+        \item Viceversa, sia $x^*$ un punto fisso di $g(x)$. In tal caso, si
+            ha 
+            $$\cancel{g(x^*)}=\cancel{x^*}-\frac{f(x^*)}{h(x^*)}$$
+            che semplificato diventa $0=f(x^*)$.
+    \end{itemize}
+\end{proof}
+Dopo aver stabilito l'equivalenza tra i due problemi, procediamo a dimostrare
+la convergenza di un metodo iterativo funzionale.
+\begin{theorem}
+   Se $g(x)$ possiede un punto fisso $x^*$ e se $g(x)$ è continua e derivabile
+   in $[x^*-\rho,x^*+\rho]$ con $\rho>0$ e soddisfa la condizione 
+   $$\left\lvert g'(x)\right\rvert\leq \lambda<1\quad \text{con
+   }x\in[x^*-\rho,x^*+\rho]$$
+   Allora per ogni $x_0\in[x^*-\rho,x^*+\rho]$, tutti i successivi $x_k$
+   generati dalla \ref{eq:metodo_iterazione_funzionale} appartengono 
+   a quell'intervallo e la successione converge a $x^*$.
+\end{theorem}
+In altre parole, il teorema ci dice che se partiamo da un punto iniziale $x_0$
+che appartiene all'intervallo che contiene $x^*$, allora tutti i punti $x_k$
+iterati successivi rimarranno all'interno di questo intervallo e convergeranno
+al punto $x^*$.
+\begin{proof}\leavevmode\
+    $$\left\lvert x_{k-1}-x^*\right\rvert<\left\lvert x_k-x^*\right\rvert$$
+    L'obiettivo è dimostrare che se la successione soddisfa questa
+    condizione per ogni $k$, allora necessariamente converge a $x^*$.
+
+    Per farlo, riscriviamo nel seguente modo:
+    \[
+    \begin{aligned}
+        \left\lvert x_{k+1}-x^*\right\rvert &= \left\lvert g(x_k) - g(x^*) \right\rvert
+    \end{aligned}
+    \]
+    Dove abbiamo utilizzato il fatto che $x_{k+1} = g(x_k)$ e $x^* = g(x^*)$.
+
+    Applicando il teorema del valor medio, otteniamo:
+    \[
+    \begin{aligned}
+        &= \left\lvert g'(\xi_k)(x_k-x^*) \right\rvert, \quad \text{dove} \quad \xi_k \in (x^*, x_k)
+    \end{aligned}
+    \]
+    Dato che per ipotesi $|g'(x)| < \lambda$ su un intervallo che contiene
+    $x^*$, abbiamo:
+    \[
+    \begin{aligned}
+        &\leq \lambda \left\lvert x_k - x^* \right\rvert, \quad \text{dove} \quad \lambda < 1
+    \end{aligned}
+    \]
+    Iterando questa disuguaglianza, otteniamo:
+    \[
+    \begin{aligned}
+        &\leq \lambda^{k+1} \left\lvert x_0 - x^* \right\rvert
+    \end{aligned}
+    \]
+    Poiché $\lambda < 1$, possiamo concludere che:
+    \[
+    \begin{aligned}
+        \lim_{k \to \infty} \left\lvert x_{k+1} - x^* \right\rvert \leq \lim_{k \to \infty} \lambda^{k+1} \left\lvert x_0 - x^* \right\rvert = 0
+    \end{aligned}
+    \]
+    Pertanto, la successione converge a $x^*$.
+\end{proof}
+\newpage
+\section{Algebra}
 \end{document}
