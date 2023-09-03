@@ -3459,7 +3459,7 @@ def simp_adapt(fn, a, m, b, fa, fm, fb, tol, sab):
                 simp_adapt(fn, m, m2, b, fm, fm2, fb, 0.5*tol, smb)) 
 \end{lstlisting}
 \newpage
-\section{Equazioni non lineari}
+\section{Zeri di funzioni non lineari}
 Si considera  il problema di trovare le radici di una funzione non
 lineare, ovvero risolvere $f(x)=0$. 
 Geometricamente, questo equivale a trovare i punti in cui la funzione $f(x)$
@@ -3712,7 +3712,7 @@ la convergenza di un metodo iterativo funzionale.
    }x\in[x^*-\rho,x^*+\rho]$$
    Allora per ogni $x_0\in[x^*-\rho,x^*+\rho]$, tutti i successivi $x_k$
    generati dalla \ref{eq:metodo_iterazione_funzionale} appartengono 
-   a quell'intervallo e la successione converge a $x^*$.
+   a questo intervallo e la successione converge a $x^*$.
 \end{theorem}
 In altre parole, il teorema ci dice che se partiamo da un punto iniziale $x_0$
 che appartiene all'intervallo che contiene $x^*$, allora tutti i punti $x_k$
@@ -3747,17 +3747,234 @@ al punto $x^*$.
     Iterando questa disuguaglianza, otteniamo:
     \[
     \begin{aligned}
-        &\leq \lambda^{k+1} \left\lvert x_0 - x^* \right\rvert
+        &\leq \lambda^{k} \left\lvert x_0 - x^* \right\rvert
     \end{aligned}
     \]
     Poiché $\lambda < 1$, possiamo concludere che:
     \[
     \begin{aligned}
-        \lim_{k \to \infty} \left\lvert x_{k+1} - x^* \right\rvert \leq \lim_{k \to \infty} \lambda^{k+1} \left\lvert x_0 - x^* \right\rvert = 0
+        \lim_{k \to \infty} \left\lvert x_{k+1} - x^* \right\rvert \leq \lim_{k \to \infty} \lambda^{k} \left\lvert x_0 - x^* \right\rvert = 0
     \end{aligned}
     \]
     Pertanto, la successione converge a $x^*$.
 \end{proof}
+
+\begin{figure}[ht]
+   \centering
+   \includegraphics[width=0.8\linewidth]{example_iterative_method}
+\end{figure}
+
+Si vuole sfruttare il Teorema precedente per dimostrare il seguente risultato:
+
+\begin{theorem}[Convergenza del metodo di Newton]
+    Se $f(x)\in C^2[a,b]$, $f(x^*)=0$ e $f'(x^*)\neq0$, allora esiste un intervallo $I=[x^*-\rho,x^*+\rho]$ contenente
+    $x^*$ tale che se $x_0\in I$ il metodo di Newton converge a  $x^*$.
+\end{theorem}
+\begin{proof}\leavevmode\
+    Se scriviamo $g(x)=x-\frac{f(x)}{h(x)}$, con $h(x)\neq0$,
+    le soluzioni di un problema sono le soluzioni dell'altro. Se prendiamo
+    $h(x)=f'(x)$, otteniamo il metodo di Newton:
+    $$g(x)=x-\frac{f(x)}{f'(x)}$$
+    Il Teorema precedente afferma che la successione
+    $x_{k+1}=g(x_k)$ converge a $x^*$ se $\left\lvert g'(x)\right\rvert<1$ per
+    ogni $x\in I$. 
+
+    Per verificare questa condizione, deriviamo $g(x)$ e otteniamo:
+    \begin{equation*}
+        \begin{aligned}
+            g'(x)&=\cancel{1}-\cancel{\frac{[f'(x)]^2}{[f'(x)]^2}}+\frac{f''(x)f(x)}{[f'(x)]^2}
+            \\ 
+                 &=\frac{f''(x)f(x)}{[f'(x)]^2}
+        \end{aligned}
+    \end{equation*}
+    Se valutiamo questa espressione in $x=x^*$, otteniamo:
+    $$\frac{f''(x^*)f(x^*)}{[f'(x)]^2}$$
+    Per ipotesi $f'(x^*)\neq0$ e $f(x^*)=0$ quindi l'espressione si annulla in
+    $x^*$. Di conseguenza esiste un intorno di $x^*$ in cui $\left\lvert g'(x)\right\rvert<1$. 
+    \begin{center}
+        \includegraphics[width=0.25\linewidth]{newton_convergence}
+    \end{center}
+\end{proof}
+
+Da ciò, possiamo concludere che la convergenza è garantita se, e solo
+se, si seleziona un intervallo opportuno in cui $g'(x)<1$. Sotto queste
+condizioni, il metodo convergerà sempre. Il passo successivo è quindi
+determinare un intervallo $I$ attorno a $x^*$ che soddisfi questa condizione,
+in modo da innescare con successo il metodo di Newton.
+
+\paragraph{Test di arresto.} Nell'implementare il metodo di Newton, è bene
+prevedere almeno tre test al verificarsi di uno dei quali ci si deve
+arrestare:
+\begin{enumerate}
+    \item $|x_k-x_{k-1}|<2u\cdot\min(\left\lvert x_{k-1} \right\rvert,
+        \left\lvert x_k\right\rvert)+tol$. Questo è analogo al test di arresto
+        utilizzato nel metodo della falsa posizione.
+    \item $k>max\_iter$. Se il valore iniziale $x_0$ non appartiene
+        all'intervallo corretto, il metodo iterativo divergerà. In altre
+        parole, gli iterati successivi non soddisfaranno mai il test di arresto,
+        risultando in un ciclo infinito. Per prevenire questo problema,
+        inseriamo un numero massimo di iterazioni, oltre al quale il metodo si
+        arresterà.
+    \item $\left\lvert f(x_k)\right\rvert\leq tol_{2}$. 
+        L'errore inerente nel calcolo di uno zero $x^*$ di una
+        funzione $f(x)$ è dato dalla formula: 
+        $$\left\lvert \hat{x^*}-x^*\right\rvert=\frac{1}{f'(\xi)}E(\hat{x}^*)$$
+
+        Questa equazione mostra che l'errore assoluto nel risultato dipende
+        sia dall'errore nei dati $E(\hat{x}^*)$ e sia dal fattore che potrebbe
+        amplificarlo , ovvero l'inverso della derivata prima $f'(\xi)$
+        in un punto $\xi$ nell'intervallo $(x^*,\hat{x}^*)$.
+
+        Osserviamo che se la derivata $f'(\xi)$ è molto piccola, il suo
+        inverso sarà molto grande, e quindi anche un piccolo errore nei dati
+        iniziali può essere amplificato in modo significativo. In tal caso, il
+        problema è mal condizionato, e il metodo dovrebbe essere interrotto
+        per evitare risultati inaccurati.
+\end{enumerate}
+\begin{lstlisting}[language=Python]
+def newton(fn, fn_p, x0, tol):
+    n=0
+    max_iter=50
+    small_real = 100*real_min
+    
+    x_curr = x0
+    x_prev = x0 + 1
+    while abs(x_curr - x_prev) > 2*u*min(abs(x_curr), abs(x_prev))+tol and n < max_iter:
+        x_prev = x_curr
+        fx_prev = fn(x_prev)
+        if abs(fx_prev)>=small_real:
+            x_curr = x_prev - (fx_prev / fn_p(x_prev))
+            n=n+1
+    return x_curr
+\end{lstlisting}
+\subsubsection*{Ordine di convergenza}
+\begin{definition}
+    Sia $\left\{x_k\right\}$ una successione convergente ad $x^*$ e sia
+    $x_k\neq x^*$ $\forall k$. Se esiste un numero $p\geq 1$, tale
+    che
+    \begin{equation*}
+       \begin{aligned}
+           & \lim_{k\to\infty}\frac{\left\lvert e_{k+1}\right\rvert}{\left\lvert
+   e_k\right\rvert^p}=\gamma & \text{dove } e_k=x_k-x^*
+       \end{aligned} 
+    \end{equation*}
+    con 
+    $$\begin{cases}
+        0<\gamma\leq 1 & \text{se }p=1 \\
+        \gamma>0 & \text{se }p>1
+    \end{cases}$$
+    si dice che la successione ha \textbf{ordine di convergenza} $p$. La
+    costante $\gamma$ è detta \textbf{fattore di convergenza}.
+    \begin{itemize}
+        \item se $p=1$ e $0<\gamma<1$ si dice che la convergenza è
+            \textbf{lineare};
+        \item se $p=1$ e $\gamma=1$ si dice che la convergenza è
+            \textbf{sublineare};
+        \item se $p>1$ e $\gamma>0$ si dice che la convergenza è
+            \textbf{superlineare}.
+    \end{itemize}
+\end{definition}
+\begin{oss}
+   Dalla definizione segue che esiste una costante $c$ tale che, da un certo
+   $k$ in poi, si ha:
+   $$\left\lvert e_{k+1}\right\rvert\leq c \left\lvert e_k\right\rvert^p$$
+   Questa disuguaglianza misura la riduzione dell'errore assoluto ad ogni
+   iterazione.
+\end{oss}
+\begin{example}
+    Il metodo di bisezione
+    $$\left\lvert e_{k+1}\right\rvert= \frac{1}{2}\left\lvert
+    e_k\right\rvert^1$$
+    ha un ordine di convergenza lineare.
+\end{example}
+\begin{theorem}
+    Sia $\left\{x_k\right\}$ una successione generata da
+    \ref{eq:metodo_iterazione_funzionale} convergente a $x^*$e sia $g(x)$
+    sufficientemente regolare in un intorno di $x^*$. Allora la successione ha
+    ordine di convergenza $p$ se e solo se 
+    $$g'(x^*)=g''(x^*)=\ldots=g^{(p-1)}(x^*)=0,\quad g^{(p)}(x^*)\neq0$$
+\end{theorem}
+Per determinare l'ordine di convergenza di un metodo di iterazione funzionale,
+si valuta $x^*$ in $g(x)$ e tutte le sue derivate successive. L'ordine di
+convergenza $p$ è determinato da tutte le derivate nulle che precedono
+l'ultima derivata non nulla $g^{(p)}(x^*)$.
+\begin{oss}\leavevmode\\
+    Poiché nel metodo di Newton abbiamo $g'(x^*)=0$, il metodo ha una
+    convergenza pari a 2. 
+\end{oss}
+
+Questo vale solo nell'ipotesi che $f'(x^*)\neq0$, cioè se $x^*$ sia una radice
+semplice di $f(x)$. Se invece la radice $x^*$ ha una molteplicità $m>1$,
+l'ordine di convergenza non sarà più 2. Il metodo rimane tuttavia convergente,
+ma con un ordine di convergenza ridotto a 1.
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{newton_convergence_2}
+\end{center}
+\subsubsection{Metodo delle secanti}
+Il metodo di Newton è veloce ma richiede di conoscere la derivata $f'(x)$
+della funzione $f(x)$ che si sta esaminando. Quando la derivata è difficile da
+calcolare o la sua valutazione è costosa, si può utilizzare il metodo delle
+secanti come alternativa.
+
+Nel metodo delle secanti, invece di utilizzare la retta tangente alla curva
+della funzione in un punto $x_k$, si utilizza la retta secante che passa
+attraverso due punti $(x_{k-1}, f(x_{k-1}))$ e $(x_k, f(x_k))$ sulla curva.
+L'intersezione di questa retta con l'asse $x$ fornisce il prossimo iterato
+$x_{k+1}$. ()
+
+La formula per calcolare $x_{k+1}$ nel metodo delle secanti è:
+$$x_{k+1}=x_k-\frac{f(x_k)}{f(x_k)-f(x_{k-1})}(x_k-x_{k-1})$$
+
+Questa si può anche vedere considerando il metodo di Newton in cui alla
+$f'(x_k)$ si sostituisce il rapporto incrementale.
+
+\begin{theorem}
+    Se $f(x)\in C^2[a,b],\ f(x^*)=0,\ f'(x^*)\neq0\text{ e }f''(x^*)\neq0$,
+    allora esiste un intervallo $I=[x^*-\rho,x^*+\rho]$ tale che $x_0,x_1\in
+    I$ ($x_0\neq x_1$) allora la successione $\left\{x_k\right\}$ (generata dal metodo delle
+    secanti) converge a $x^*$ per $k\to\infty$.
+    
+    Inoltre, il 
+    $$\lim_{k\to\infty}\frac{\left\lvert e_{k+1}\right\rvert}{\left\lvert
+    e_k\right\rvert^p}=\gamma\neq0$$
+    dove $p=\frac{1}{2}(\sqrt{5}+1)\approx1.618\ldots$
+\end{theorem}
+
+Il metodo delle secanti ha un ordine di convergenza che si colloca tra 1 e 2.
+Questo lo rende  più efficiente di un algoritmo con convergenza lineare, ma
+meno efficiente del metodo di Newton in termini di velocità di convergenza.
+
+Tuttavia, c'è un aspetto da considerare: nel metodo delle secanti, il valore
+$x_{k-1}$ è già stato calcolato nell'ite-razione precedente, quindi non è
+necessario rivalutarlo. Al contrario, il metodo di Newton richiede la
+valutazione sia della funzione che della sua derivata ad ogni iterazione.
+
+In altre parole, sebbene il metodo di Newton possa convergere più rapidamente,
+ogni sua iterazione è computazionalmente più costosa rispetto al metodo delle
+secanti. Questo diventa particolarmente rilevante se la derivata della
+funzione è onerosa da calcolare. In tali casi, il costo computazionale
+associato al calcolo della derivata nel metodo di Newton potrebbe annullare i
+vantaggi della sua più rapida convergenza.
+
+\begin{lstlisting}[language=Python]
+def secant(fn, x0, x1, tol):
+    n=0
+    max_iter=50
+    small_real=100*real_min
+    
+    x_next = x1
+    x_curr = x0
+    fx_curr = fn(x0)
+    while abs(x_next - x_curr) > 2*u*min(abs(x_next), abs(x_curr)) and n < max_iter:
+        x_prev = x_curr
+        fx_prev = fx_curr
+        x_curr = x_next
+        fx_curr = fn(x_curr)
+        if (abs(fx_curr)>=small_real):
+            x_next = x_curr - fx_curr * (x_curr-x_prev) / (fx_curr-fx_prev)
+            n=n+1
+    return x_next
+\end{lstlisting}
 \newpage
-\section{Algebra}
+\section{Algebra lineare numerica}
 \end{document}
