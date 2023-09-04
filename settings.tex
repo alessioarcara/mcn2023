@@ -85,6 +85,21 @@
 }
 \lstset{style=mystyle}
 
+\lstdefinelanguage{Rust}{
+  keywords={break, const, continue, else, enum, extern, fn, for, if, impl, in, let, loop, match, mod, pub, return, struct, trait, type, unsafe, use, where, while},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={bool, i8, i16, i32, i64, isize, u8, u16, u32, u64, usize, f32, f64, String, str, char, Option, Some, None, Box, Vec, Result, Ok, Err},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
 % --- Altri comandi ---
 % Ruffini
 \ExplSyntaxOn

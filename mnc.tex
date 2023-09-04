@@ -2375,7 +2375,7 @@ def newton_interpolation(x, y):
     \end{equation*}
 \end{example}
 \paragraph{Soluzione di un sistema lineare con matrice triangolare
-inferiore.}
+inferiore.}\label{para:soluzione_interpolazione_newton}
 Dato un sistema lineare con una matrice triangolare inferiore $L$, possiamo
 risolvere il sistema seguendo questi passaggi:
 \begin{enumerate}
@@ -3977,4 +3977,287 @@ def secant(fn, x0, x1, tol):
 \end{lstlisting}
 \newpage
 \section{Algebra lineare numerica}
+Uno dei problemi più frequenti del calcolo scientifico è la soluzione di un
+sistema lineare. In forma matriciale può essere scritto come 
+$$Ax=b$$
+dove $A$ è una data matrice di ordine $n\times n$, $b$ è un dato vettore
+colonna con $n$ elementi ed $x$ è il vettore delle incognite.
+
+In algebra lineare si studiano metodi per risolvere sistemi lineari non
+singolari. Un metodo noto è quello di Cramer nel quale ogni componente della
+soluzione è espressa come:
+$$x_i = \frac{\det\left[a_1, \ldots, \overset{i}{b}, \ldots, a_n\right]}{\det\left[a_1, \ldots, a_i, \ldots, a_n\right]}$$
+dove il numeratore si ottiene dal denominatore sostituendo alla $i$-ma colonna
+$a_i$ la colonna $b$.
+\begin{example}
+   Se si cerca di risolvere un sistema di 20 equazioni con la regola di Cramer
+   sarebbe necessario calcolare 21 determinanti di ordine 20. Per calcolare il
+   determinante di una matrice $n\times n$, con lo sviluppo di Laplace,
+   servono $(n-1)n!$ moltiplicazioni; nel nostro esempio sarà $19\cdot20!$ e
+   quindi l'intero sistema comporterà $19\cdot20!\cdot21$ moltiplicazioni, più
+   un ugual numero di addizioni. Su un Macbook M1, oggi si possono fare
+   $2.6\times10^{12}$ moltiplicazioni al secondo (2600 GFLOPs), così che, solo
+   le moltiplicazioni richiederanno un tempo di calcolo di circa 11 anni.
+\end{example}
+Nell'esempio precedente abbiamo visto che l'uso della regola di Cramer per
+risolvere il sistema lineare $Ax=b$ è impraticabile dal punto di vista
+computazionale. Pertanto, in questo capitolo introduciamo due metodi
+alternativi per affrontare questo tipo di problemi.
+\subsection{Fattorizzazione $LU$}
+L'obiettivo è fattorizzare una matrice quadrata $A$ nel prodotto di una
+matrice triangolare inferiore $L$ per una matrice triangolare superiore $U$:
+$$\underset{n\times n}A=\underset{n\times n}L\cdot\underset{n\times n}U$$
+con 
+\begin{equation*}
+   \begin{aligned}
+       & L = \begin{bmatrix}
+           1 & 0 & 0 & \cdots & 0 \\
+           l_{21} & 1 & 0 & \cdots & 0 \\
+           l_{31} & l_{32} & 1 & \cdots & 0 \\
+           \vdots & \vdots & \vdots & \ddots & \vdots \\
+           l_{n1} & l_{n2} & l_{n3} & \cdots & 1
+           \end{bmatrix} &
+           U = \begin{bmatrix}
+           u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\
+           0 & u_{22} & u_{23} & \cdots & u_{2n} \\
+           0 & 0 & u_{33} & \cdots & u_{3n} \\
+           \vdots & \vdots & \vdots & \ddots & \vdots \\
+           0 & 0 & 0 & \cdots & u_{nn}
+       \end{bmatrix}
+   \end{aligned}
+\end{equation*}
+Una volta ottenute le due matrici, è possibile riformulare il sistema lineare
+$Ax=b$ come:
+$$L\cdot\underbrace{\underset{n\times n}U\cdot\underset{n\times1}x}_{y}=b$$
+Definiamo $y=U\times b$, e risolviamo il sistema in due passaggi:
+\begin{enumerate}
+    \item Risolviamo $Ly=b$ utilizzando la sostituzione in avanti per trovare $y$.
+    \item Una volta trovato $y$, risolviamo $Ux=y$ utilizzando la sostituzione
+        all'indietro, per ottenere $x$.
+\end{enumerate}
+In questo modo, la soluzione del sistema originale $Ax=b$ viene ricondotta
+alla soluzione di due sistemi lineari più semplici e computazionalmente meno
+costosi.
+\subsubsection{Sostituzione in avanti}
+Per risolvere il primo sistema $Ly=b$, dove $L$ è una matrice triangolare inferiore,
+si può fare riferimento al metodo discusso nel Paragrafo
+\ref{para:soluzione_interpolazione_newton}.
+\subsubsection{Sostituzione all'indietro}
+La sostituzione all'indietro è essenzialmente analogo alla sostituzione in
+avanti, ma si parte dall'ultima equazione e si procede all'indietro. Entrambi
+i metodi hanno un costo computazionale di $\mathcal{O}(n^2)$.
+
+Consideriamo il seguente sistema lineare triangolare superiore:
+$$
+\begin{bmatrix}
+    u_{11} & u_{12} & u_{13} \\ 
+    0 & u_{22} & u_{23} \\ 
+    0 & 0 & u_{33}
+\end{bmatrix} 
+\begin{bmatrix}
+    x_1 \\ 
+    x_2 \\ 
+    x_3 
+\end{bmatrix} =
+\begin{bmatrix}
+    y_1 \\ 
+    y_2 \\ 
+    y_3
+\end{bmatrix} 
+$$
+Dopo aver calcolato $x_3$, aggiorniamo il vettore $y$ e risolviamo il sistema
+ridotto:
+$$
+\begin{bmatrix}
+    u_{11} & u_{12} \\ 
+    0 & u_{22}
+\end{bmatrix}
+\begin{bmatrix}
+    x_1 \\ 
+    x_2 
+\end{bmatrix} = 
+\begin{bmatrix}
+    y_1 - u_{13}x_3\\ 
+    y_2 -u_{23}x_3
+\end{bmatrix}$$
+E così via, fino a quando tutte le incognite $x$ sono state calcolate.
+\begin{lstlisting}[language=Rust]
+fn backward_substitution<const N: usize>(u: &SquareMatrix<N>, y: &Vector<N>) -> Vector<N> {
+    let mut x = zeros_vector::<N>();
+    let mut y = y.clone();
+
+    for k in (0..N).rev() {
+        x[k] = y[k] / u[k][k];
+        for i in 0..k {
+            y[i] = y[i] - u[i][k] * x[k];
+        }
+    }
+    x
+}
+\end{lstlisting}
+\subsubsection{Metodo di Gauss}
+\begin{theorem}
+    Se i \underline{minori principali} di ordine di $k$ di $A$ per
+    $k=1,\ldots,n-1$ sono diversi da zero, allora esiste una e una sola
+    fattorizzazione $LU$ di $A$.
+\end{theorem}
+
+\begin{center}
+    \includegraphics[width=0.4\linewidth]{lu_theorem}
+\end{center}
+
+Per illustrare il metodo di Gauss per la fattorizzazione $LU$, consideriamo
+una matrice $\underset{3\times3}A$:
+$$A=\begin{bmatrix}
+    a_{11} & a_{12} & a_{a13} \\ 
+    a_{21} & a_{22} & a_{23} \\ 
+    a_{31} & a_{32} & a_{33}
+\end{bmatrix}$$
+Affinché la fattorizzazione $LU$ sia possibile, è necessario che siano
+soddisfatte le seguenti condizioni:
+$$
+a_{11}\neq0 \quad \text{ e } \quad \text{det}\begin{bmatrix}
+    a_{11} & a_{12} \\ 
+    a_{21} & a_{22}
+\end{bmatrix}\neq0
+        $$
+Il procedimento di fattorizzazione si svolge in $n-1$ passi, dove $n$ è la
+dimensione della matrice. Per una matrice $3\times3$, ci sono quindi 2 passi.
+\begin{enumerate}
+    \item \textbf{Primo passo}: costruiamo una matrice $L_1$ come segue: 
+    $$L_1=\begin{bmatrix}
+        1 & 0 & 0 \\ 
+        -\frac{a_{21}}{a_{11}} & 1 & 0 \\ 
+        -\frac{a_{31}}{a_{11}} & 0 & 1
+    \end{bmatrix}$$
+
+    Notiamo che è essenziale $a_{11}\neq0$ per evitare la divisione per zero.
+
+    Moltiplicando $L_1$ per $A$, tutti gli elementi della prima colonna sotto la
+    diagonale principale diventeranno zero:
+    $$L_1A=A_1=\begin{bmatrix}
+        a_{11} & a_{12} & a_{a13} \\ 
+        0 & \overset{(1)}{a_{22}} & \overset{(1)}{a_{23}} \\ 
+        0 & \overset{(1)}{a_{32}} & \overset{(1)}{a_{33}}
+    \end{bmatrix}$$
+    Dove $\overset{(1)}{a_{ij}}=a_{ij}-\frac{a_{i1}}{a_{11}}a_{1j}$, $i,j=2,3$.
+    \item\textbf{Secondo passo}: costruiamo una matrice $L_2$ siffatta:
+    $$L_2=\begin{bmatrix}
+        1 & 0 & 0 \\ 
+        0 & 1 & 0 \\ 
+        0 & -\frac{\overset{(1)}{a_{32}}}{\overset{(1)}{a_{22}}} & 1
+    \end{bmatrix}$$
+    Moltiplicando $L_2$ per $A_1$, otteniamo $A_2$:
+    $$L_2A_1=A_2=\begin{bmatrix}
+        a_{11} & a_{12} & a_{13} \\ 
+        0 & \overset{(1)}{a_{22}} & \overset{(1)}{a_{23}} \\ 
+        0 & 0 & \overset{(2)}{a_{33}}
+    \end{bmatrix}$$
+    Dove $\overset{(2)}{a_{33}}=\overset{(1)}{a_{33}}-\frac{\overset{(1)}{a_{32}}}{\overset{(1)}{a_{22}}}\overset{(1)}{a_{23}}$.
+\end{enumerate}
+Dopo aver completato i passi della fattorizzazione, otteniamo $U$ come $A_2$.
+Osserviamo che le matrici $L_1$ e $L_2$ sono non singolari. Questo è garantito
+dal fatto che il determinante di ciascuna matrice,  calcolato come il prodotto
+degli elementi della sua diagonale, è diverso da zero. Pertanto, entrambe  le
+matrici sono invertibili.
+
+Per ottenere le matrici $L_{1}^{-1}$ e $L_{2}^{-1}$ basta invertire il segno
+degli elementi al di fuori della diagonale nelle matrici originali $L_1$ e
+$L_2$.
+
+Allo stesso modo, la matrice composta $L_{1}^{-1}L_{2}^{-1}$ si ottiene
+attraverso un'operazione di assemblaggio.
+\begin{example}
+    Consideriamo la matrice $A$:
+    $$A=\begin{bmatrix}
+        2 & 1 & 0 \\ 
+        4 & 5 & 2 \\ 
+        6 & 15 & 12
+    \end{bmatrix}$$ 
+    Verifica condizioni:
+    $$a_{11}=2\neq0 \quad \text{ e } \quad \text{det}\begin{bmatrix}
+        2 & 1 \\ 
+        4 &  5
+    \end{bmatrix}=10-4=6\neq0$$
+    $1^{\circ}$ passo: $L_1$ deve essere triangolare inferiore e tale da
+    rendere nulli gli elementi della prima colonna $A$ sotto l'elemento
+    $a_{11}=2$
+    \begin{equation*}
+       \begin{aligned}
+           & L_1=
+           \begin{bmatrix}
+               1 & 0 & 0 \\ 
+               -2 & 1 & 0 \\ 
+               -3 & 0 & 1
+           \end{bmatrix}
+           & L_1A=A_1=\begin{bmatrix}
+               2 & 1 & 0 \\ 
+               0 & 3 & 2 \\ 
+               0 & 12 & 12
+           \end{bmatrix}
+       \end{aligned} 
+    \end{equation*}
+    $2^{\circ}$ passo: $L_2$ deve essere triangolare inferiore e tale da rendere
+    nulli gli elementi della seconda colonna $A_1$ sotto l'elemento
+    $\overset{(1)}{a_{22}}=3$.
+    \begin{equation*}
+       \begin{aligned}
+           & L_2=
+           \begin{bmatrix}
+               1 & 0 & 0 \\ 
+               0 & 1 & 0 \\ 
+               0 & -4 & 1
+           \end{bmatrix}
+           & L_2A_1=A_2=\begin{bmatrix}
+               2 & 1 & 0 \\ 
+               0 & 3 & 2 \\ 
+               0 & 0 & 4
+           \end{bmatrix}\\
+           & {\color{red}U}=A_2 & {\color{red}L}=L_{1}^{-1}L_{2}^{-1}=\begin{bmatrix}
+               1 & 0 & 0 \\ 
+               2 & 1 & 0 \\ 
+               3 & 4 & 1
+           \end{bmatrix}
+       \end{aligned} 
+    \end{equation*}
+\end{example}
+
+\begin{lstlisting}[language=Rust]
+fn lu_decomposition<const N: usize>(a: &SquareMatrix<N>) -> (SquareMatrix<N>, SquareMatrix<N>) {
+    let mut u = a.clone();
+    let mut l = identity_matrix();
+
+    for k in 0..N - 1 {
+        for i in k + 1..N {
+            l[i][k] = u[i][k] / u[k][k];
+            for j in 0..=k {
+                u[i][j] = 0.;
+            }
+            for j in k + 1..N {
+                u[i][j] -= l[i][k] * u[k][j];
+            }
+        }
+    }
+    (l, u)
+}
+\end{lstlisting}
+
+Per determinare la suddetta fattorizzazione, sono necessarie $\frac{n(n-1)}{2}$
+divisioni per calcolare gli elementi di $L$, e
+$(n-1)^2+(n-2)^2+\ldots+1=\frac{(n-1)n(2n-1)}{6}$ addizioni e moltiplicazioni
+per gli elementi di $U$. In totale, il costo computazionale è dell'ordine di
+$\mathcal{O}(n^3)$.
+\paragraph{Calcolo di $A^{-1}$}
+\paragraph{Calcolo del $\text{det}(A)$.}
+Consideriamo una matrice $A$ e procediamo con la sua fattorizzazione $LU$.
+Utilizzando il teorema di Binet, possiamo calcolare il determinante di $A$
+come segue:
+$$\text{det}(A)=\text{det}(L)\times \text{det}(U)$$
+Dato che $L$ è una matrice triangolare inferiore con tutti gli elementi della
+diagonale uguale a 1, il suo determinante sarà $\text{det}(L)=1$. Inoltre, il
+determinante della matrice triangolare $U$ è dato dal prodotto degli
+elementi sulla diagonale. Di conseguenza:
+$$\text{det}(A)=\text{det}(U)=\prod_{i=1}^{n}u_{i,i}$$
+In questo modo, il calcolo del determinante di $A$ ha una complessità
+computazionale di $\mathcal{O}(n^3)$.
 \end{document}
