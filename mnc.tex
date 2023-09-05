@@ -4026,6 +4026,9 @@ con
        \end{bmatrix}
    \end{aligned}
 \end{equation*}
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{lu}
+\end{center}
 Una volta ottenute le due matrici, è possibile riformulare il sistema lineare
 $Ax=b$ come:
 $$L\cdot\underbrace{\underset{n\times n}U\cdot\underset{n\times1}x}_{y}=b$$
@@ -4103,7 +4106,7 @@ fn backward_substitution<const N: usize>(u: &SquareMatrix<N>, y: &Vector<N>) -> 
 \end{theorem}
 
 \begin{center}
-    \includegraphics[width=0.4\linewidth]{lu_theorem}
+    \includegraphics[width=0.6\linewidth]{lu_theorem}
 \end{center}
 
 Per illustrare il metodo di Gauss per la fattorizzazione $LU$, consideriamo
@@ -4123,6 +4126,16 @@ a_{11}\neq0 \quad \text{ e } \quad \text{det}\begin{bmatrix}
         $$
 Il procedimento di fattorizzazione si svolge in $n-1$ passi, dove $n$ è la
 dimensione della matrice. Per una matrice $3\times3$, ci sono quindi 2 passi.
+
+Prima di procedere, è utile notare come sono strutturate le matrici $L_{k}$
+che useremo. Ogni matrice $L_k$ è una matrice identità modificata, in cui gli
+elementi $l_{ik}$ nella $k$-esima colonna sotto la diagonale sono calcolati
+cambiando segno all'elemento $a_{ik}$ della matrice $A$ e dividendo per
+l'elemento diagonale corrispondente $a_{kk}$, cioè
+$l_{ik}=-\frac{a_{ik}}{a_{kk}}$. Questi elementi sono costruiti per annullare
+gli elementi sotto la diagonale nella $k$-esima colonna della matrice $A$
+corrente quando $L_{k}$ viene moltiplicata per $A$.
+
 \begin{enumerate}
     \item \textbf{Primo passo}: costruiamo una matrice $L_1$ come segue: 
     $$L_1=\begin{bmatrix}
@@ -4133,8 +4146,8 @@ dimensione della matrice. Per una matrice $3\times3$, ci sono quindi 2 passi.
 
     Notiamo che è essenziale $a_{11}\neq0$ per evitare la divisione per zero.
 
-    Moltiplicando $L_1$ per $A$, tutti gli elementi della prima colonna sotto la
-    diagonale principale diventeranno zero:
+    Moltiplicando $L_1$ per $A$, otteniamo una nuova matrice $A_1$, in cui
+    tutti gli elementi nella prima colonna sotto $a_{11}$ sono zero:
     $$L_1A=A_1=\begin{bmatrix}
         a_{11} & a_{12} & a_{a13} \\ 
         0 & \overset{(1)}{a_{22}} & \overset{(1)}{a_{23}} \\ 
@@ -4147,7 +4160,8 @@ dimensione della matrice. Per una matrice $3\times3$, ci sono quindi 2 passi.
         0 & 1 & 0 \\ 
         0 & -\frac{\overset{(1)}{a_{32}}}{\overset{(1)}{a_{22}}} & 1
     \end{bmatrix}$$
-    Moltiplicando $L_2$ per $A_1$, otteniamo $A_2$:
+    Moltiplicando $L_2$ per $A_1$, otteniamo una nuova matrice $A_2$, in cui
+    tutti gli elementi nella seconda colonna sotto $a_{22}$ sono zero:
     $$L_2A_1=A_2=\begin{bmatrix}
         a_{11} & a_{12} & a_{13} \\ 
         0 & \overset{(1)}{a_{22}} & \overset{(1)}{a_{23}} \\ 
@@ -4155,18 +4169,22 @@ dimensione della matrice. Per una matrice $3\times3$, ci sono quindi 2 passi.
     \end{bmatrix}$$
     Dove $\overset{(2)}{a_{33}}=\overset{(1)}{a_{33}}-\frac{\overset{(1)}{a_{32}}}{\overset{(1)}{a_{22}}}\overset{(1)}{a_{23}}$.
 \end{enumerate}
+
+$$L_{2}(L_{1}A)=U$$
 Dopo aver completato i passi della fattorizzazione, otteniamo $U$ come $A_2$.
 Osserviamo che le matrici $L_1$ e $L_2$ sono non singolari. Questo è garantito
 dal fatto che il determinante di ciascuna matrice,  calcolato come il prodotto
 degli elementi della sua diagonale, è diverso da zero. Pertanto, entrambe  le
 matrici sono invertibili.
-
+$$A=L_{1}^{-1}L_{2}^{-1}U$$
 Per ottenere le matrici $L_{1}^{-1}$ e $L_{2}^{-1}$ basta invertire il segno
 degli elementi al di fuori della diagonale nelle matrici originali $L_1$ e
 $L_2$.
 
-Allo stesso modo, la matrice composta $L_{1}^{-1}L_{2}^{-1}$ si ottiene
-attraverso un'operazione di assemblaggio.
+Infine, invece di eseguire un costoso prodotto matriciale, la matrice composta
+$L_{1}^{-1}L_{2}^{-1}$ può essere ``assemblata'' prendendo gli elementi sotto
+la diagonale da ciascuna delle matrici inverse e inserirli nella posizione
+corrispondente nella matrice $L$ finale.
 \begin{example}
     Consideriamo la matrice $A$:
     $$A=\begin{bmatrix}
@@ -4222,6 +4240,32 @@ attraverso un'operazione di assemblaggio.
     \end{equation*}
 \end{example}
 
+Nella implementazione effettiva si utilizza un'unica matrice $U$ che
+all'inizio della $k$-ma interazione contiene $A^{k}$ e viene quindi
+sovrascritta con $A^{(k+1)}$. Se la procedura viene portata a termine con
+successo, alla fine $U$ conterrà esattamente la matrice $U$ della
+fattorizzazione $LU$. Per quanto riguarda la matrice $L$, essa viene
+inizializzata come $L=I$ ed alla iterazione $k$-ma gli elementi sotto la
+diagonale della $k$-esima colonna di $L$ vengono aggiornati.
+\begin{equation*}
+   \begin{aligned}
+       & l_{ij}^{(k)}=\begin{cases}
+           1 & \text{per }i=j\\ 
+           -\frac{a_{ij}^{(k-1)}}{a_{jj}^{(k-1)}} & \text{per }i>k \text{ e }
+           j=k \\ 
+           0 & \text{altrimenti}
+       \end{cases}
+       & a_{ij}^{(k)}=\begin{cases}
+           a_{ij}^{(k-1)} & \text{per }i\leq k-1 \\
+           0 & \text{per }i\geq k \text{ e }j\leq k-1 \\ 
+           a_{ij}^{(k-1)}+l_{ik}^{(k)}a_{kj}^{(k-1)} & \text{per }i\geq k\text{ e }j\geq
+           k
+       \end{cases}
+   \end{aligned} 
+\end{equation*}
+\begin{center}
+    \includegraphics[width=0.6\linewidth]{lu_matrices}
+\end{center}
 \begin{lstlisting}[language=Rust]
 fn lu_decomposition<const N: usize>(a: &SquareMatrix<N>) -> (SquareMatrix<N>, SquareMatrix<N>) {
     let mut u = a.clone();
@@ -4247,7 +4291,26 @@ divisioni per calcolare gli elementi di $L$, e
 $(n-1)^2+(n-2)^2+\ldots+1=\frac{(n-1)n(2n-1)}{6}$ addizioni e moltiplicazioni
 per gli elementi di $U$. In totale, il costo computazionale è dell'ordine di
 $\mathcal{O}(n^3)$.
-\paragraph{Calcolo di $A^{-1}$}
+\paragraph{Calcolo di $A^{-1}$.} Consideriamo una matrice $A$ che sia
+invertibile. Per calcolare $A^{-1}$
+in modo efficiente possiamo sfruttare la fattorizzazione $LU$. L'obiettivo è
+di risolvere il sistema lineare $AX=I$, dove $I$ è la matrice identità.
+
+Per ogni colonna $e$ della matrice identità $I$, eseguiamo i seguenti
+passaggi:
+$$\begin{cases}
+   Ly_i=e_i \\ 
+   Ux_i=y_i
+\end{cases}$$
+
+La soluzione $x$ sarà la $i$-esima colonna di $A^{-1}$. Combinando tutte le
+colonne $x$ trovate, otteniamo $A^{-1}$.
+
+La fattorizzazione $LU$ ha un costo di $\mathcal{O}(n^3)$. Ogni sistema
+lineare da risolvere ha un costo di $\mathcal{O}(n^2)$, e dato che ci sono $n$
+sistemi da risolvere, il costo totale per questa parte è anche
+$\mathcal{O}(n^3)$. Sommando i due, il costo totale per calcolare $A^{-1}$ è
+$\mathcal{O}(n^3)$.
 \paragraph{Calcolo del $\text{det}(A)$.}
 Consideriamo una matrice $A$ e procediamo con la sua fattorizzazione $LU$.
 Utilizzando il teorema di Binet, possiamo calcolare il determinante di $A$
