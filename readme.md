@@ -7,7 +7,9 @@
 | [`bernstein.ipynb`](./esempi/bernstein.ipynb)          | Valutazione di polinomi nella base di Bernstein                      |
 | [`ieee754.ipynb`](./esempi/ieee754.ipynb)              | Rappresentazione in memoria secondo lo standard IEEE 754             |
 | [`interpolation.ipynb`](./esempi/interpolation.ipynb)  | Interpolazione polinomiale nella base di Newton e di Lagrange        |
-| [`mnc.tex`](./mnc.tex)                          | Appunti del corso                                                           |
+| [`integration.ipynb`](./esempi/integration.ipynb)      | Formule di quadratura composite e adattive per l'integrazione numerica |
+| [`roots.ipynb`](./esempi/roots.ipynb)                  | Metodi per calcolare le radici di funzioni non lineari               |
+| [`mnc.tex`](./mnc.tex)                                 | Appunti del corso                                                    |
 | [`esercitazione_5.ipynb`](./esercitazioni/esercitazione_5/esercitazione.ipynb) | Esercitazione 5                              |
 
 ## Come iniziare
