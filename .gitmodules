@@ -1,0 +1,3 @@
+[submodule "esempi/aalgebra"]
+	path = esempi/aalgebra
+	url = https://github.com/alessioarcara/aalgebra
