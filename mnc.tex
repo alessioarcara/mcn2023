@@ -2064,7 +2064,7 @@ desideriamo che il nostro polinomio assuma -  e gli $x_i$ - i punti
 corrispondenti a questi valori. Ciò che manca sono i coefficienti del
 polinomio, indicati con $a$.
 
-Potremmo considerare l'interpolazione come il problema inverso ella
+Potremmo considerare l'interpolazione come il problema inverso della
 valutazione di un polinomio. Nella valutazione, abbiamo i coefficienti del
 polinomio e gli $x_i$ dove desideriamo valutare il polinomio. Invece,
 nell'in-terpolazione, abbiamo i valori $y_i$ del polinomio e gli $x_i$, ma non
@@ -2447,7 +2447,7 @@ def forward_substitution(L, y):
 \paragraph{Valutazione di un polinomio nella base di Newton.}
 Il polinomio nella base di Newton è dato da:
 $$p(x)=b_0+b_1(x-x_0)+b_2(x-x_0)(x-x_1)+\ldots+b_n(x-x_0)\cdots(x-x_{n-1})$$
-Possiamo esprimere il polinomio in una forma che facilita la sua valutazione,m
+Possiamo esprimere il polinomio in una forma che facilita la sua valutazione,
 similmente all'algoritmo di Horner, raccogliendo i termini simili:
 \begin{align*}
 & \quad p(x) = b_0 + b_1(x-x_0) + b_2(x-x_0)(x-x_1) + \ldots + b_n(x-x_0) \ldots (x-x_{n-1}) \\
@@ -4238,6 +4238,9 @@ corrispondente nella matrice $L$ finale.
            \end{bmatrix}
        \end{aligned} 
     \end{equation*}
+    Se ora volessimo risolvere un sistema lineare $Ax=b$, dove $b$ è un
+    vettore arbitrario, potremmo farlo risolvendo i seguenti sistemi:
+    $$Ly=b\quad\text{ e }\quad Ux=y$$
 \end{example}
 
 Nella implementazione effettiva si utilizza un'unica matrice $U$ che
@@ -4323,4 +4326,302 @@ elementi sulla diagonale. Di conseguenza:
 $$\text{det}(A)=\text{det}(U)=\prod_{i=1}^{n}u_{i,i}$$
 In questo modo, il calcolo del determinante di $A$ ha una complessità
 computazionale di $\mathcal{O}(n^3)$.
+\subsubsection{Fattorizzazione $LU$ con scambio delle righe e perno massimo}
+Consideriamo la matrice $A$:
+$$\begin{bmatrix}
+    0 & 3 \\ 
+    1 & 2
+\end{bmatrix}$$
+In questo caso, $a_{11}=0$, il che ci rende impossibile applicare una fattorizzazione $LU$.
+Tuttavia, effettuando uno scambio di righe, possiamo riscrivere la matrice come segue:
+$$\begin{bmatrix}
+    1 & 2 \\ 
+    0 & 3
+\end{bmatrix}$$
+Ora, con $a_{11}\neq0$, siamo di nuovo nelle condizioni di poter procedere con
+la fattorizzazione.
+
+Arricchiamo pertanto il metodo visto in precedenza con questa nuova informazione.
+\begin{theorem}
+    Per ogni matrice $\underset{n\times n}{A}$ è sempre possibile trovare una
+    matrice di permutazione $P$ per cui $PA$ sia fattorizzabile in $LU$, cioè
+    $$PA=LU$$
+\end{theorem}
+La matrice di permutazione $P$ è una matrice di comodo ottenuta dalla matrice
+identità scambiando opportunamente alcune righe. Moltiplicare $P$ per un'altra
+matrice $A$ ha l'effetto di scambiare le righe di $A$.
+
+\begin{example}
+    Usiamo la matrice di permutazione $P$ per scambiare la prima e la terza
+    riga di $A$:
+    \begin{equation*}
+           A=\begin{bmatrix}
+               1 & 2 & 3 \\ 
+               4 & 5 & 6 \\ 
+               7 & 8 & 9
+           \end{bmatrix}, 
+           \quad P = \begin{bmatrix}
+               0 & 0 & 1 \\ 
+               0 & 1 & 0 \\ 
+               1 & 0 & 0
+           \end{bmatrix}  
+    \end{equation*}
+    Moltiplicando $P$ per $A$, otteniamo:
+    \begin{equation*}
+        PA = \begin{bmatrix}
+            7 & 8 & 9 \\ 
+            4 & 5 & 6 \\ 
+            1 & 2 & 3
+        \end{bmatrix}
+    \end{equation*}
+\end{example}
+
+Se al passo $k$ il perno $a_{kk}$ è zero, cerchiamo un nuovo perno in una riga
+$h$ successiva alla riga $k$ e scambiamo le righe in modo che $a_{hk}$ prenda
+il posto di $a_{kk}$. Tuttavia, se $a_{kk}=0$ e tutti i possibili nuovi perni
+nelle righe successive sono anch'essi nulli, allora il procedimento si
+arresta. In questo caso, quanto trovato fino a quel momento rappresenta la
+fattorizzazione cercata.
+
+
+Prima di formalizzare l'algoritmo di fattorizzazione $LU$ con scambio delle
+righe, applichiamo l'analisi all'indietro per stimare la stabilità
+dell'algoritmo di fattorizzazione descritto.
+\paragraph{Stabilità della fattorizzazione $LU$.}
+Poiché le operazioni nell'algoritmo di fattorizzazione $LU$ sono
+effettuate in aritmetica finita, i fattori $L$ e $U$ generati non sono esatti.
+In altre parole, otteniamo $\tilde{L}=L+\delta L$ e $\tilde{U}=U+\delta U$.
+
+Una volta ottenute le matrici $\tilde{L}$ e $\tilde{U}$, possiamo considerarle
+come la fattorizzazione di una matrice $A$ perturbata, $A+\delta A$, ottenuta
+attraverso un algoritmo esatto. Quindi abbiamo:
+
+\begin{equation*}
+   \begin{aligned}
+       A+\delta A&=\tilde{L}\tilde{U}=(L+\delta L)(U+\delta U)\\ 
+                 &=LU+L\delta U+\delta LU+\delta L\delta U
+   \end{aligned} 
+\end{equation*}
+
+Da questa relazione, notiamo che $A$ e $LU$ sono identici, quindi rimane:
+$$\delta A=L\delta U+\delta LU+\delta L\delta U$$ 
+Trascurando il prodotto di errori, poiché numericamente irrilevanti, otteniamo:
+$$\delta A\approx L\delta U+\delta LU$$
+da cui segue che se gli elementi di $L$ e $U$ sono grandi, essi amplificano
+l'errore introdotto in $\delta A$ (gli errori di arrotondamento).
+
+Perciò diremo che la fattorizzazione $A=LU$ è numericamente \textbf{stabile}
+se gli elementi di $L$ ed $U$ non sono troppo grandi rispetto agli elementi di
+$A$.
+\begin{definition}
+   Se esistono delle costanti $a$ e $b$ indipendenti dagli elementi di $A$
+   tali che gli elementi della matrice $L$ sono $\leq a$ e gli elementi della
+   matrice $U$ sono $\leq b$, allora la fattorizzazione $LU$ è detta
+   \textbf{stabile in senso forte}; se le costanti $a$ e $b$ dipendono
+   dall'ordine di $A$, allora la fattorizzazione $LU$ è detta \textbf{stabile
+   in senso debole}.
+\end{definition}
+
+Sebbene si sia visto che per ogni matrice, a patto di un'opportuna
+permutazione, esiste sempre la fattorizzazione $LU$, in generale questa
+potrebbe non essere stabile. Infatti gli elementi
+$$l_{ik}=\frac{\overset{(k-1)}{a_{ik}}}{\overset{(k-1)}{a_{kk}}}$$
+possono assumere valori molto grandi e quindi gli elementi di $L$ possono
+crescere oltre ogni limite.
+
+Quindi questo porta a modificare l'algoritmo di Gauss introducendo lo scambio delle
+righe non solo per individuare un pivot non nullo, ma quello massimo. Questo
+si realizza al passo $k$-esimo scegliendo come pivot fra gli
+$\overset{(k-1)}{a_{ik}}$ con $i=k,\ldots,n$ il più grande in valore assoluto,
+così che a scambio delle righe effettuato risulti 
+
+$$\left\lvert \overset{(k-1)}{a_{kk}}\right\rvert \geq\left\{\left\lvert
+\overset{(k-1)}{a_{ik}}\right\rvert\right\}_{i=k+1,\ldots,n}$$ 
+\begin{center}
+    \includegraphics[width=0.4\linewidth]{lu_maxpivot}
+\end{center}
+
+Applicando l'algoritmo di Gauss di scambio delle righe e perno massimo
+avremo che tutti gli elementi di $L$ sono $\leq 1$, mentre non riesce a
+limitare gli elementi di $U$ che possono crescere esponenzialmente con
+l'ordine di $A$. Infatti si ha che:
+$$\max \left\lvert u_{ij}\right\rvert\leq 2^{n-1}\max \left\lvert
+a_{ij}\right\rvert$$
+Perciò l'algoritmo genera una fattorizzazione \textbf{stabile in senso
+debole}.
+\begin{example}
+    $$A_0=\begin{bmatrix}
+        2 & 3 & 0 \\ 
+        4 & 1 & 4 \\ 
+        6 & 3 & 3
+    \end{bmatrix}$$
+    $$
+    I_{2,0}A_{0}=\begin{bmatrix}
+        6 & 3 & 3 \\ 
+        4 & 1 & 4 \\ 
+        2 & 3 & 0
+    \end{bmatrix},\quad L_1=\begin{bmatrix}
+        1 & 0 & 0 \\ 
+        -\frac{2}{3} & 1 & 0 \\ 
+        -\frac{1}{3} & 0 & 1
+    \end{bmatrix},\quad
+    L_1(I_{2,0}A_{0})=\begin{bmatrix}
+        6 & 3 & 3 \\ 
+        0 & -1 & 2 \\ 
+        0 & 2 & -1
+    \end{bmatrix}
+    $$
+    $$
+    I_{2,1}A_{1}=\begin{bmatrix}
+        6 & 3 & 3 \\ 
+        0 & 2 & -1 \\
+        0 & -1 & 2 
+    \end{bmatrix},\quad L_2=\begin{bmatrix}
+        1 & 0 & 0 \\ 
+        0 & 1 & 0 \\ 
+        0 & \frac{1}{2} & 1
+    \end{bmatrix},\quad
+    L_2(I_{2,1}A_{1})=\begin{bmatrix}
+        6 & 3 & 3 \\ 
+        0 & 3 & 6 \\ 
+        0 & 0 & \frac{3}{2}
+    \end{bmatrix}
+    $$
+    $$L_2I_{2,1}L_1I_{2,0}A=U$$
+    $$\underbrace{L_2\underbrace{P_2L_1P_2}_{\tilde{L}_1}}_{L}\underbrace{P_2P_1}_{P}A=U$$
+\end{example}
+\subsection{Condizionamento del problema $Ax=b$}
+In questa sezione si vuole esaminare come, perturbazioni sugli elementi della
+matrice $A$ e sugli elementi del termine noto $b$ influenzano la soluzione $x$
+del sistema lineare. Queste perturbazioni sono tipicamente dovute agli errori
+di approssimazione quando la matrice $A$ ed il termine noto $b$ vengono
+rappresentati con numeri finiti. Per essere in grado di stimare gli errori,
+dobbiamo introdurre una misura della \textit{distanza fra vettori}.
+\begin{definition}
+    Siano $x,y\in \mathbb{R}^n$ e $\alpha\in R$. Una \textbf{norma vettoriale}
+    $\lVert \cdot \rVert$ è una funzione $\mathbb{R}^n\to \mathbb{R}$ che
+    associa ad un vettore di $\mathbb{R}$ un valore reale (la lunghezza del
+    vettore). Tale funzione per essere una norma vettoriale deve soddisfare le
+    tre seguenti proprietà:
+    \begin{enumerate}
+        \item $\lVert x\rVert\geq 0$ e $\lVert x\rVert=0$ se e solo se $x=0$
+        \item $\lVert x+y\rVert\leq \lVert x\rVert+\lVert y\rVert$
+            (disuguaglianza triangolare)
+        \item $\lVert \alpha x\rVert=\left\lvert \alpha\right\rvert \lVert
+            x\rVert$
+    \end{enumerate}
+\end{definition}
+Le norme vettoriali più importanti sono:
+\begin{itemize}
+    \item $\lVert x\rVert_1=\displaystyle\sum_{i=1}^{n}\left\lvert x_i\right\rvert$ 
+    \item $\lVert
+        x\rVert_2=\sqrt{\displaystyle\sum_{i=1}^{n}x_i^2}=(x^Tx)^{\frac{1}{2}}$
+    \item $\lVert x\rVert_{\infty}=\max_{1\leq i\leq n}\left\lvert x_i\right\rvert$
+\end{itemize}
+La $\lVert \cdot\rVert_2$ è una generalizzazione ad $\mathbb{R}^n$ dell'usuale distanza in $\mathbb{R}^2$ ed è detta norma
+Euclidea.
+\begin{definition}
+    Una \textbf{norma matriciale} $\lVert \cdot\rVert$ è una funzione
+    $\mathbb{R}^{m\times n}\to \mathbb{R}$ che associa ad una matrice di
+    $\mathbb{R}^{m\times n}$ un valore reale. Tale funzione, per essere una
+    norma matriciale deve soddisfare le seguenti proprietà:
+    \begin{enumerate}
+        \item $\lVert A\rVert\geq0$ e $\lVert A\rVert=0$ se e solo se $A=0$
+        \item $\lVert A+B\rVert\leq \lVert A\rVert+\lVert B\rVert$
+        \item $\lVert \alpha A\rVert=\left\lvert \alpha\right\rvert \lVert A\rVert$
+    \end{enumerate}
+\end{definition}
+\begin{definition}[Norma matriciale indotta da una norma vettoriale]
+    In alternativa, è possibile definire la norma matriciale a partire dalla norma
+    vettoriale come
+    $$\lVert A\rVert=\max_{x\neq0}\frac{\lVert \underset{(m\times
+    n)}A\underset{(n\times 1)}x\rVert}{\lVert x\rVert}$$
+\end{definition}
+Le norme indotte sono particolarmente utili perché godono delle seguenti
+proprietà:
+\begin{itemize}
+    \item $\lVert Ax\rVert\leq \lVert A\rVert \lVert x\rVert$
+    \item $\lVert AB\rVert \leq \lVert A\rVert \lVert B\rVert $
+\end{itemize}
+Le norme matriciali più importanti sono:
+\begin{itemize}
+    \item $\lVert A\rVert_1=\max_{1\leq j\leq
+        n}\sum_{i=1}^{n}\left\lvert a_{ij}\right\rvert$ 
+    \item $\lVert A\rVert_\infty=\max_{1\leq i\leq
+        m}\sum_{j=1}^{n}\left\lvert a_{ij}\right\rvert$ 
+    \item $\lVert A\rVert_2=\left(\lambda_{max}(A^TA)\right)^{\frac{1}{2}}$
+        (norma spettrale)
+\end{itemize}
+
+Con le norme, possiamo introdurre i concetti di distanza in $\mathbb{R}^{n}$.
+Sia $\tilde{x}$ un vettore soluzione calcolata e $x$ un vettore soluzione
+esatta. Per una data norma vettoriale $\lVert \cdot \rVert$, si definisce 
+\begin{itemize}
+    \item \textbf{Errore assoluto}
+        $$\lVert \tilde{x}-x\rVert$$
+    \item \textbf{Errore relativo}
+        $$\frac{\lVert \tilde{x}-x\rVert}{\lVert x\rVert}$$
+\end{itemize}
+\paragraph{Errore inerente.} Affrontiamo ora lo studio dell'errore inerente
+del problema $Ax=b$ considerando separatamente eventuali perturbazioni sulla
+matrice $A$ e sul vettore dei termini noti $b$.
+
+\begin{itemize}
+    \item Introduciamo un vettore di perturbazione $\delta b\in \mathbb{R}^n$
+        sul termine noto; cerchiamo $x+\delta x\in \mathbb{R}^n$ soluzione del
+        sistema perturbato 
+        $$A(x+\delta x)=(b+\delta b)$$
+        poiché $Ax=b$ risulterà
+        $$A\delta x=\delta b$$
+        da cui 
+        $$\delta x=A^{-1}\delta b$$
+        Passando alle norme 
+        $$\lVert \delta x\rVert=\lVert A^{-1}\delta b\rVert\leq \lVert
+        A^{-1}\rVert \lVert \delta b\rVert$$
+        inoltre vale 
+        $$\lVert b\rVert=\lVert Ax\rVert\leq \lVert A\rVert \lVert x\rVert$$
+        Allora 
+        $$
+        \begin{aligned}
+            \frac{\lVert \delta x\rVert}{\lVert x\rVert}&\leq \frac{\lVert
+            A^{-1}\rVert \lVert \delta b\rVert}{\lVert x\rVert} \\ 
+                                                        &\leq {\color{red}\lVert
+                                                        A^{-1}\rVert \lVert A\rVert}\frac{\lVert \delta
+                                                b\rVert}{\lVert b\rVert}
+        \end{aligned}
+        $$
+        Dunque il condizionamento di $Ax=b$ dipende dalla costante 
+        $$K=\lVert A^{-1}\rVert \lVert A\rVert$$
+        detto numero di condizione di $A$.
+    \item Analogamente, per una perturbazione $\delta A$ su $A$.
+\end{itemize}
+
+\begin{theorem}
+    Sia $A$ non singolare e sia $r=\lVert A^{-1}\rVert \lVert \delta
+    A\rVert<1$; allora la matrice $A+\delta A$ è non singolare, e 
+    $$\lVert (A+\delta A)^{-1}\rVert\leq \frac{\lVert A^{-1}\rVert}{1-r}$$
+    La soluzione del sistema perturbato
+    $$(A+\delta A)(x+\delta x)=(b+\delta b)$$
+    soddisfa 
+    $$\leq \frac{K(A)}{1-r}\left(\frac{\lVert \delta A\rVert}{\lVert
+    A\rVert}+\frac{\lVert \delta b\rVert}{\lVert b\rVert}\right)$$
+\end{theorem}
+Se stiamo cercando di risolvere un sistema lineare $Ax=b$, è importante
+considerare che l'inserimento della matrice $A$ in un calcolatore introduce
+delle perturbazioni. Queste potrebbero alterare la matrice, rendendola 
+singolare e quindi non invertibile. La soluzione del sistema perturbato è
+garantita se la condizione $r<1$ è soddisfatta.
+
+L'errore relativo nella soluzione $x$ è influenzato sia dagli errori nei dati
+di input $A$ e $b$, sia da un fattore di amplificazione $\frac{K(A)}{1-r}$.
+Qui, $K(A)$ è il numero di condizione di $A$, una quantità che dovrebbe essere
+calcolata prima di risolvere il sistema, per valutare quanto il problema sia
+ben condizionato e decidere se procedere.
+
+\begin{lstlisting}[language=Rust]
+fn cond<const N: usize>(a: &SquareMatrix<N>, norm_type: NormType) -> f64 {
+    norm(&a.inverse().expect("The given matrix is not invertible"), norm_type) * norm(a, norm_type)
+}
+\end{lstlisting}
+\subsection{Fattorizzazione $QR$}
 \end{document}
