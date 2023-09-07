@@ -4624,4 +4624,339 @@ fn cond<const N: usize>(a: &SquareMatrix<N>, norm_type: NormType) -> f64 {
 }
 \end{lstlisting}
 \subsection{Fattorizzazione $QR$}
+L'obiettivo è fattorizzare una matrice quadrata $A$ nel prodotto di una
+matrice ortogonale $Q$ per una matrice triangolare superiore $R$:
+$$\underset{n\times n}A=\underset{n\times n}Q\cdot \underset{n\times n}R$$
+con 
+$$
+\begin{array}{l}
+    Q^TQ=I \\ 
+    \text{od anche} \\ 
+    Q^{T}=Q^{-1}
+\end{array}\quad
+R = \begin{bmatrix}
+    r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\
+    0 & r_{22} & r_{23} & \cdots & r_{2n} \\
+    0 & 0 & r_{33} & \cdots & r_{3n} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & r_{nn}
+\end{bmatrix}
+$$
+\begin{center}
+    \includegraphics[width=0.4\linewidth]{qr}
+\end{center}
+\begin{oss}\leavevmode\\
+Sia $\underset{n\times n}Q$ ortogonale ed $a$ un vettore $n\times1$, allora
+$\lVert Qa\rVert_2=\lVert a\rVert_2$. 
+\end{oss}
+In altre parole, applicare una matrice ortogonale $Q$ a un vettore $a$ non
+cambia la sua norma euclidea, ossia la sua distanza dall'origine.
+\begin{proof}
+    $$\begin{aligned}
+        \lVert Qa\rVert_2^2&=(Qa)^T(Qa)=(a^TQ^T)(Qa)=\\ 
+                           &=a^T(Q^TQ)a=a^TIa=a^Ta=\lVert a\rVert_2^2
+    \end{aligned}$$
+\end{proof}
+Una volta ottenute le due matrici, è possibile riformulare il sistema lineare
+$Ax=b$ come:
+$$Q\cdot\underbrace{\underset{n\times n}R\cdot\underset{n \times 1}x}_y=b$$
+Definiamo $Rx=y$, e risolviamo il sistema in due passaggi: 
+\begin{enumerate}
+    \item Risolviamo il sistema $Qy=b$ sfruttando la definizione di $Q$
+        ortogonale cioè $y=Q^Tb$.
+    \item Una volta trovato $y$, risolviamo $Rx=y$ utilizzando la sostituzione
+        all'indietro per ottenere $x$.
+\end{enumerate}
+\subsubsection{Matrici elementari di Householder}
+Nella fattorizzazione $LU$, facevamo uso di matrici elementari di Gauss per
+azzerare elementi e ottenere una forma triangolare. In modo analogo, nella
+fattorizzazione $QR$, utilizzeremo matrici elementari conosciute come matrici
+di Householder per raggiungere un obiettivo simile.
+
+Per una matrice elementare di Householder si intende una matrice $H$ tale che 
+$$Ha=\pm \lVert a\rVert_2e_1=\begin{bmatrix}
+    \pm \lVert a\rVert_2 \\ 
+    0 \\ 
+    \vdots \\
+    0
+\end{bmatrix}$$
+Le matrici elementari di Householder sono sia simmetriche $(H=H^T)$ che ortogonali.
+
+Dato un vettore $a$, possiamo costruire una trasformazione di Householder nel
+modo seguente: definiamo il vettore di Householder $v$ come 
+        $$v=\begin{bmatrix}
+           a_1\pm \lVert a\rVert_2^2\\ 
+           a_ 2\\ 
+           \vdots \\
+           a_n
+        \end{bmatrix}$$
+Quindi, la matrice $H$ è 
+$$H=I-\beta vv^T\quad\text{ dove }\quad\beta=\frac{2}{\lVert v\rVert_2^2}$$
+$H$ è simmetrica per costruzione, essendo $I-\beta vv^T$.
+
+Dimostriamo ora che $H$ è ortogonale:
+\begin{proof}
+    $$\begin{aligned}
+        H^TH&=(I-\beta vv^T)(I-\beta vv^T) \\
+            &=I-\beta vv^T-\beta vv^T+\beta vv^t\beta vv^T \\
+            &= I-2\beta vv^T+\beta \frac{2}{\cancel{\lVert
+            v\rVert_2^2}}\underbrace{vv^T}_{\cancel{\lVert
+            v\rVert_{2}^2}}vv^T\\ 
+            &=I-\cancel{2\beta vv^T}+\cancel{2\beta vv^T}\\ 
+            &=I
+    \end{aligned}$$
+\end{proof}
+Infine, verifichiamo che, quando applicata al vettore $a$, la matrice $H$
+azzeri tutte le componenti tranne la prima:
+$$\begin{aligned}
+    Ha&=(I-\beta vv^T)a\\ 
+      &=a-\beta vv^Ta \quad \text{ dico che }\quad bv^Ta=1\\ 
+      &=a-v\\ 
+      &=\begin{bmatrix}
+       a_1 \\ 
+       a_2 \\ 
+       \vdots \\ 
+       a_n
+      \end{bmatrix} - \begin{bmatrix}
+        a_1\pm \lVert a\rVert_2 \\ 
+        a_2 \\ 
+        \vdots \\ 
+        a_n
+      \end{bmatrix}= 
+      \begin{bmatrix}
+          \pm \lVert a\rVert_2 \\ 
+          0 \\ 
+          \vdots \\ 
+          0
+      \end{bmatrix}=\pm \lVert a\rVert_2 e_1
+\end{aligned}$$
+verifichiamo $\beta v^Ta=1$
+\begin{proof}
+$$\begin{aligned}
+    v^Ta&=\begin{bmatrix}a_1\pm \lVert a\rVert_2 & a_2 & \ldots & a_n\end{bmatrix}\begin{bmatrix}
+        a_1 \\ 
+        a_2 \\ 
+        \vdots \\ 
+        a_n
+   \end{bmatrix}\\ 
+   &= a_1^2\pm a_1 \lVert a\rVert_2+a_2^2+\ldots+a_n^2 \\ 
+   &=\lVert a\rVert_2^2\pm a_1 \lVert a \rVert_2 \\ 
+   &= \lVert a\rVert_2(\lVert a\rVert_2\pm a_1)
+\end{aligned}$$
+inoltre $\beta=\frac{2}{\lVert v\rVert_2^2}$ e
+$$\begin{aligned}
+    \lVert v\rVert_2^2&=v^Tv=\begin{bmatrix}a_1\pm \lVert a\rVert_2 & a_2 & \ldots & a_n\end{bmatrix}
+    \begin{bmatrix}
+        a_1\pm \lVert a\rVert_2 \\ 
+        a_2 \\ 
+        \vdots \\ 
+        a_n
+    \end{bmatrix}\\ 
+        &=(a_1\pm \lVert a\rVert_2)^2=a_2^2+\ldots+a_n^2 \\ 
+        &=a_1^2+2a_1 \lVert a\rVert_2 + \lVert a\rVert_2^2+a_2^2+\ldots+a_n^2
+        \\ 
+        &= 2 \lVert a\rVert_2^2\pm2a_1 \lVert a\rVert_2 \\ 
+        &= 2 \lVert a\rVert_2(\lVert a\rVert_2\pm a_1)
+\end{aligned}$$
+e quindi 
+$$\beta v^Ta=\frac{\cancel{2\lVert a\rVert_2(\lVert a\rVert_2\pm a_1)
+    }}{\cancel{2\lVert a\rVert_2(\lVert a\rVert_2\pm a_1})
+}=1$$
+\end{proof}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{householder_transformation}
+\end{center}
+\begin{example}
+   Dato il vettore $a=\begin{bmatrix}
+       72\\ 
+       -144\\ 
+       -144\\
+   \end{bmatrix}$, si determini la matrice $H$ che azzera la
+   seconda e terza componente. 
+   \begin{enumerate}
+       \item
+           $$\lVert a\rVert_2=\sqrt{72^2+144^2+144^2}=216,\quad v=\begin{bmatrix}
+               72 + 216 \\
+               -144\\ 
+               -144
+               \end{bmatrix}=\begin{bmatrix}
+               288 \\ 
+               -144 \\ 
+           -144\end{bmatrix}$$
+    \item 
+        $$\beta=\frac{2}{288^2+144^2+144^2}=\frac{1}{62808}$$
+    \item 
+        $$
+        \begin{aligned}
+            H&=I-\beta vv^T=\begin{bmatrix}
+                1 & 0 & 0 \\ 
+                0 & 1 & 0 \\ 
+                0 & 0 & 1
+                \end{bmatrix}-\frac{1}{62208}\begin{bmatrix}
+                288 \\ 
+                -144 \\ 
+                -144
+                \end{bmatrix}\begin{bmatrix}
+                288 & -144 & -144 
+            \end{bmatrix} \\ 
+            &= \begin{bmatrix}
+                1 & 0 & 0 \\ 
+                0 & 1 & 0 \\ 
+                0 & 0 & 1
+            \end{bmatrix}-\begin{bmatrix}
+                \frac{4}{3} & -\frac{2}{3} & -\frac{2}{3} \\ 
+                -\frac{2}{3} & -\frac{1}{3} & \frac{1}{3} \\ 
+                -\frac{2}{3} & \frac{1}{3} & \frac{1}{3}
+            \end{bmatrix}\\ 
+            &= \begin{bmatrix}
+                -\frac{1}{3} & \frac{2}{3} & \frac{2}{3} \\ 
+                \frac{2}{3} & \frac{2}{3} & -\frac{1}{3} \\ 
+                \frac{2}{3} & -\frac{1}{3} & \frac{2}{3}
+            \end{bmatrix}
+        \end{aligned}$$
+    \item 
+        $$
+        Ha= \begin{bmatrix}
+            -\frac{1}{3} & \frac{2}{3} & \frac{2}{3} \\ 
+            \frac{2}{3} & \frac{2}{3} & -\frac{1}{3} \\ 
+            \frac{2}{3} & -\frac{1}{3} & \frac{2}{3}
+            \end{bmatrix}\begin{bmatrix}
+            72 \\ 
+            -144 \\ 
+            -144 
+            \end{bmatrix}=\begin{bmatrix}
+            -216 \\ 
+            0 \\ 
+            0
+        \end{bmatrix}$$
+   \end{enumerate}
+\end{example}
+\subsubsection{Metodo di Householder}
+Procediamo ad illustrare come funziona l'algoritmo per fattorizzare $QR$
+una matrice $\underset{n\times n}A$.
+
+Si pone $A_0=A$ e si costruisce una matrice $H_1$ tale che 
+$$H_1A_0=\begin{bmatrix}
+    \lVert \overset{(0)}{a_1}\rVert & \times & \ldots & \times \\ 
+    0 & \vdots & & \vdots \\ 
+    \vdots \\ 
+    0 & \times & \ldots & \times 
+\end{bmatrix}=A_1$$
+quindi una $H_2$ tale che 
+$$H_2A_1=\begin{bmatrix}
+    \lVert \overset{(0)}{a_1}\rVert & \times & \times & \ldots & \times \\ 
+    0 & \lVert \overset{(1)}{a_2}\rVert & \times & \ldots & \times \\ 
+    \vdots & 0 & \vdots \\ 
+           & \vdots \\ 
+    0 & 0 & \times & \ldots & \times
+\end{bmatrix}=A_2$$
+e così via fino ad una $H_{n-1}$ tale che 
+$$
+H_{n-1}A_{n-2}=\begin{bmatrix}
+    \lVert \overset{(0)}{a_1}\rVert & \times & \times & \ldots & \times \\ 
+    0 & \lVert \overset{(1)}{a_2}\rVert & \times & \ldots & \times \\ 
+    \vdots & 0 & \ddots & & \vdots \\ 
+           & \vdots & & \ddots & \times \\ 
+    0 & 0 & \ldots & & \lVert \overset{(n-2)}{a_n}\rVert
+\end{bmatrix}=R
+$$
+così che 
+$$
+\begin{aligned}
+    H_{n-1}H_{n-2}\ldots H_2H_1A&=R \\ 
+    \alignedintertext{Ma le $H_k$ matrici sono tutte ortogonali ed il
+        prodotto di matrici ortogonali è ancora una matrice ortogonale, da
+    cui} \\ 
+    A&=\underbrace{H_{1}^TH_{2}^T\ldots H_{n-2}^TH_{n-1}^T}_QR \\ 
+    A&=QR
+\end{aligned}
+$$
+\begin{center}
+    \includegraphics[width=0.75\linewidth]{qr_pseudocode}
+\end{center}
+\begin{example}
+    Si calcoli la fattorizzazione $QR$ della matrice 
+    $$A_0=A=\begin{bmatrix}
+        72 & -144 & -144 \\ 
+        -144 & -36 & -360 \\ 
+        -144 & -360 & 450
+    \end{bmatrix}$$
+    \begin{enumerate}
+        \item  
+            $$\beta_1=\frac{1}{62208},\quad v_1=\begin{bmatrix}
+                288 \\ 
+                -144 \\ 
+                -144 
+            \end{bmatrix}$$
+            $$H_1=I-\beta_1v_1^Tv_1=\frac{1}{6}\begin{bmatrix}
+                -2 & 4 & 4 \\ 
+                4 & 4 & -2 \\ 
+                4 & -2 & 4
+                \end{bmatrix},\quad H_1A_0=\begin{bmatrix}
+                -216 & -216 & 108 \\ 
+                0 & 0 & 486 \\ 
+                0 & -324 & 324
+            \end{bmatrix}=A_1$$
+        \item  
+            $$\beta_2=\frac{1}{104976},\quad v_2=\begin{bmatrix}
+                0 \\ 
+                324 \\ 
+                -324 
+            \end{bmatrix}$$
+            $$H_2=I-\beta_2v_2^Tv_2=\begin{bmatrix}
+                1 & 0 & 0 \\ 
+                0 & 0 & 1 \\ 
+                0 & 1 & 0
+                \end{bmatrix},\quad H_2A_1=\begin{bmatrix}
+                -216 & -216 & 108 \\ 
+                0 & -324 & 324 \\ 
+                0 & 0 & -486
+            \end{bmatrix}=A_2$$
+    \end{enumerate}
+    per cui $R=A_2$ e 
+    $$Q=H_1H_2=\frac{1}{6}\begin{bmatrix}
+        -2 & 4 & 4 \\ 
+        4 & -2 & 4 \\ 
+        4 & 4 & -2
+    \end{bmatrix}$$
+\end{example}
+Il metodo di Householder, per risolvere il sistema lineare $Ax=b$, può essere
+implementato senza calcolare effettivamente le matrici $H_{k}$. La procedura è
+la seguente:
+
+Iniziamo considerando la matrice $T_0$, che è composta dalla matrice $A$ e dal
+vettore $b$ come colonna aggiuntiva:
+$$T_0=\left[A_0|b_0\right]=\left[A|b\right]$$ 
+A ogni passo $k$, costruiamo i valori $\beta_k$, $v_k$, e un vettore $y_{k}^T$
+calcolato come $y_k^T=v_{k}^TT_k$. La matrice $T_{k+1}$, viene quindi
+aggiornata come segue:
+$$T_{k+1}=T_{k}-\beta_kv_ky_{k}^T$$ 
+Dopo $n-1$ iterazioni, otteniamo la matrice $T_{n-1}$, che è nella forma:
+$$T_n=\left[A_n|b_n\right]=\left[R|b_{n}\right]$$ 
+Con questa matrice, possiamo risolvere il sistema $Rx=b_{n}$, che è
+equivalente al sistema iniziale $Ax=b$.
+\paragraph{Costo computazionale e stabilità della fattorizzazione $QR$.}
+La complessità computazionale della fattorizzazione $QR$ è di
+$\mathcal{O}(n^3)$, o più specificamente di $\frac{2}{3}n^3$, se non si tiene
+conto del calcolo delle matrici $H_k$ e dei loro prodotti. Questo è circa il
+doppio del costo associato alla fattorizzazione $LU$. Tuttavia, un vantaggio
+significativo della fattorizzazione $QR$ è la sua maggiore stabilità numerica.
+
+Procedendo con un'analisi all'indietro, esattamente come già fatto
+nel caso della fattorizzazione $LU$ si ha che 
+$$\begin{aligned}
+    A+\delta A&=(Q+\delta Q)(R+\delta R) \\ 
+    \cancel{A}+\delta A &= \cancel{QR}+Q\delta R+\delta Q R+\delta Q\delta R \\ 
+    \alignedintertext{Trascurando il prodotto di errori, poiché numericamente
+    irrilevanti, otteniamo: }\\ 
+    \delta A&=Q\delta R+\delta QR
+\end{aligned}$$ 
+Gli elementi della matrice $Q$ sono limitati dalla sua norma, che è 1 poiché
+$Q$ è una matrice ortogonale. Gli elementi della matrice $R$, invece sono
+limitati da $\sqrt{n}\max{i,j}\left\lvert a_{i,j}\right\rvert$.
+
+Da cui risulta che l'algoritmo di fattorizzazione QR è stabile in senso debole
+con estremo $\sqrt{n}$, che risulta comunque più stabile dell'algoritmo $LU$
+essendo $\sqrt{N}\ll2^{n-1}$.
+
 \end{document}
