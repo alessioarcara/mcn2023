@@ -2513,7 +2513,7 @@ Questo sistema può essere espresso in forma matriciale:
     \end{aligned}
 \end{equation*}
 La matrice del sistema lineare è composta dai valori delle funzioni base di
-Bernstein valutati nel punti $x_i$. Tuttavia, per migliorare la precisione
+Bernstein valutati nei punti $x_i$. Tuttavia, per migliorare la precisione
 numerica, è conveniente traslare e scalare i punti di interpolazione
 nell'intervallo $[0,1]$ mediante la \ref{eq:cambio_variabile}. 
 \begin{center}
@@ -2673,7 +2673,7 @@ def lagrange_evaluation(x, y, x_bar):
     \end{itemize}
     Queste notazioni sono utilizzate per indicare quanto sia ``liscia" una funzione, cioè quante derivate continue possiede.
 \end{recap}
-Sia $f(x)$ è la funzione assegnata nell'intervallo $[a,b]$ e sia $p(x)$ il
+Sia $f(x)$ la funzione assegnata nell'intervallo $[a,b]$ e sia $p(x)$ il
 polinomio interpolante nei punti $(x_i,f(x_i)),i=0,\ldots,n$; ha senso chiedersi quanto sia grande l'errore di
 interpolazione
 $$R(x)=\left\lvert f(x)-p(x)\right\rvert$$
@@ -2747,7 +2747,7 @@ equispaziati.
     per $n\to\infty$ e $\left\lvert
     f(x)-p_n(x)\right\rvert\underset{n\rightarrow\infty}{\to}0$
 \end{theorem}
-Quindi se i punti di interpolazione vengono sono scelti opportunamente (come per esempio
+Quindi se i punti di interpolazione vengono scelti opportunamente (come per esempio
 gli zeri del polinomio di Chebyshev di grado $n+1$\footnote{
     $x_i=\cos(\frac{(2i+1)\pi}{2(n+1)}),\quad i=0,\ldots,n$ sono gli $n+1$
     zeri reali del polinomio di Chebyshev di prima specie di grado $n+1$
@@ -3028,7 +3028,7 @@ integrazione.
                                               &=h{\color{red}W_i}
    \end{aligned} 
 \end{equation*}
-Notiamo che che i coefficienti $W_i$, dipendono soltanto dal grado $n$ del
+Notiamo che i coefficienti $W_i$, dipendono soltanto dal grado $n$ del
 polinomio interpolante e non dalla specifica funzione $f(x)$  da integrare o
 dall'intervallo di integrazione. Quindi, una volta calcolati, possono essere
 utilizzati  per approssimare l'integrale di qualsiasi funzione $f(x)$ senza
@@ -3382,7 +3382,7 @@ caso delle formule composite:
             più precisa dell'integrale.
         \item[{\color{red}*}]\textbf{Stima dell'errore}. Inoltre, il corollario fornisce una stima
             del termine principale dell'errore e quindi fornisce un metodo
-            pratico per raggiungere l'obiettivo che si è posti. Si può
+            pratico per raggiungere l'obiettivo che ci si è posti. Si può
             progettare un metodo iterativo in cui si dimezza il passo fino
             a che 
             \begin{equation}\label{eq:stima_errore_integrazione}
@@ -4959,4 +4959,185 @@ Da cui risulta che l'algoritmo di fattorizzazione QR è stabile in senso debole
 con estremo $\sqrt{n}$, che risulta comunque più stabile dell'algoritmo $LU$
 essendo $\sqrt{N}\ll2^{n-1}$.
 
+\subsection{Metodi iterativi}
+Per risolvere un sistema lineare $Ax=b$, oltre ai metodi diretti, si possono
+utilizzare anche i metodi iterativi, che risultano essere particolarmente
+convenienti se la matrice è molto grande o sparsa, ovvero se il numero degli
+elementi non nulli di $A$ è dell'ordine della dimensione della matrice.
+Questo perché i metodi diretti possono generare matrici intermedie con
+elementi non nulli dove nella matrice originale erano presenti elementi non
+nulli. Di conseguenza, la matrice perde la sua sparsità durante le operazioni
+intermedie.
+\vskip 0.1in
+\paragraph{Idea.} Sia $\underset{n\times n}A$ una matrice e si consideri la
+decomposizione di $A$ nella forma 
+$$A=M-N$$
+dove $M$ è una matrice non singolare e facilmente invertibile. Sostituendo
+tale decomposizione nel sistema $Ax=b$ si ha 
+$$\begin{aligned}
+    (M-N)x&=b\\ 
+    Mx&=Nx+b\\ 
+    \alignedintertext{ed essendo $M$ non singolare}\\ 
+    x&=M^{-1}Nx+M^{-1}b\\ 
+    \alignedintertext{Posto $P=M^{-1}N$ e $q=M^{-1}b$ si ottiene il seguente
+    sistema}\\ 
+    x&=Px+q\\ 
+    \alignedintertext{equivalente ad $Ax=b$.}
+\end{aligned}$$
+Questo ci consente di introdurre un metodo iterativo come segue:
+\begin{equation}\label{eq:metodo_iterativo_matrici}
+    x^{(k)}=Px^{(k-1)}+q\quad k=1,2,\ldots
+\end{equation}
+con $x_0$ assegnato.
+
+L'obiettivo è che la successione di vettori $\left\{x^{(k)}\right\}$ converga
+alla soluzione $x^*$ del sistema lineare, ovvero
+$$\lim_{k\to\infty}x^{k}=x^*$$
+
+\begin{definition}[Convergenza di una successione di vettori]
+    Una successione $\left\{x^{(k)}\right\}$ di vettori di $\mathbb{R}^n$ si
+    dice convergente al vettore $x^*\in \mathbb{R}^n$ se esiste una norma
+    vettoriale per cui 
+    $$\lim_{k\to\infty}\lVert x^{(k)}-x^*\rVert=0\quad \forall x^{(0)} \text{
+    iniziale assegnato.}$$
+    In questo caso si scrive $\lim_{k\to\infty}x^{(k)}=x^*$
+\end{definition}
+\begin{theorem}
+    Il metodo iterativo \ref{eq:metodo_iterativo_matrici} è convergente se e
+    solo se il \textbf{raggio spettrale} $\rho(P)$, definito come l'autovalore
+    massimo in modulo della matrice $P$ è minore di 1.
+\end{theorem}
+
+Questo teorema fornisce una condizione necessaria e sufficiente che permette
+di determinare a priori la convergenza del metodo iterativo.
+
+È utile ricordare che gli autovalori di $A$ sono quei valori $\lambda$ che
+soddisfano $Ax=\lambda x$. Per trovare gli autovalori, costruiamo il polinomio
+caratteristico di grado $n$ in $\lambda$. Gli autovalori sono le radici di
+questo polinomio e il raggio spettrale è il modulo del più grande di questi
+autovalori. Tuttavia, calcolare il raggio spettrale per una grande matrice è
+oneroso, quindi si cercano condizioni più facilmente verificabili.
+
+\begin{theorem}
+    Se esiste una norma matriciale indotta $\lVert \cdot\rVert$, per cui
+    $\lVert P\rVert<1$ allora il metodo iterativo
+    \ref{eq:metodo_iterativo_matrici} è convergente.
+\end{theorem}
+
+Questo secondo teorema offre un criterio alternativo basato sulla norma della
+matrice, che è più facile da calcolare. Va notato, tuttavia, che questa è una
+condizione solo sufficiente, non necessaria. Vale a dire che se
+$\rho(P)<1<\lVert P\rVert$, il secondo teorema non fornisce alcuna
+informazione sulla convergenza, anche se il metodo può comunque convergere. Ma
+è certamente più pratico del calcolo di tutti gli autovalori e del raggio
+spettrale.
+
+\paragraph{Costo computazionale.} 
+In un metodo iterativo, ad ogni iterazione, il costo computazionale è dominato
+dalle operazioni di moltiplicazione della matrice $P$ per un vettore, che ha
+una complessità di $\mathcal{O}(n^2)$. Tuttavia, se la matrice $P$ è sparsa,
+le operazioni sono limitate agli elementi non nulli della matrice. Di
+conseguenza, la complessità diventa dell'ordine di $\mathcal{O}(\text{numero di
+elementi non nulli}^2)$. Quindi, in questi casi, i metodo iterativi possono
+risultare competitivi con quelli diretti.
+
+\paragraph{Test di arresto.}
+Per interrompere il metodo iterativo è necessario stabilire un test di arresto
+appropriato. In maniera analoga a quanto fatto per le equazioni non lineari,
+possiamo considerare due differenti misure per valutare la convergenza del
+metodo:
+$$\lVert x^{(k)}-x^{(k-1)}\rVert\leq tol \quad\text{ e }\quad \frac{\lVert
+x^{(k)}-x^{(k-1)}\rVert}{\min(\lVert x^{(k)}\rVert), \lVert
+x^{(k-1)}\rVert}\leq tol$$
+
+Va notato che queste due condizioni non assicurano che la soluzione ottenuta
+sia approssimata con una precisione pari a $tol$.
+
+\paragraph{Condizionamento e stabilità.}
+Nel contesto dei metodi iterativi, il condizionamento della soluzione di un
+sistema lineare è influenzato non solo dal numero di condizionamento $K(A)$
+della matrice originale $A$, ma anche dal raggio spettrale $\rho(P)$ della
+matrice iterativa $P$. Più $\rho(P)$ si avvicina a 1, più il problema è mal
+condizionato.
+
+Per quanto riguarda l'errore algoritmico, i metodi iterativi hanno il
+vantaggio di essere generalmente meno sensibili alla propagazione degli errori
+rispetto ai metodi diretti. Questo accade perché ogni vettore \(x^{(k)}\)
+nell'iterazione può essere visto come il risultato di una singola iterazione a
+partire dal vettore precedente \(x^{(k-1)}\). Di conseguenza, \(x^{(k)}\) è
+influenzato principalmente dagli errori di arrotondamento generati nell'ultima
+iterazione, non da un accumulo di errori attraverso iterazioni multiple come
+nei metodi diretti.
+
+
+\subsubsection{Metodi di Jacobi e Gauss-Seidel}
+
+Si consideri la decomposizione della matrice $A$
+$$A=D-L-U$$
+dove 
+$$
+    D=\begin{bmatrix}
+        a_{11} & & & \\ 
+               & a_{22}  & & \\ 
+               & & \ddots & \\ 
+               & & & a_{nn}
+    \end{bmatrix}\quad 
+    L=\begin{bmatrix}
+    0 & \ldots & & 0 \\ 
+    -a_{21} & \ddots & & \vdots\\ 
+    \vdots & \ddots & & \\ 
+    -a_{n1} & \ldots & -a_{nn-1} & 0
+    \end{bmatrix}\quad 
+    U=\begin{bmatrix}
+        0 & -a_{12} & \ldots & -a_{1n} \\ 
+        \vdots & \ddots & \ddots & \\ 
+               & & & -a_{n-1n} \\ 
+        0 & \ldots & & 0
+    \end{bmatrix}
+$$
+Scegliendo 
+$$M=D\quad N=L+U$$ 
+si ottiene il metodo di Jacobi, mentre scegliendo 
+$$M=D-L\quad N=U$$
+si ottiene il metodo di Gauss-Seidel.
+
+Nel metodo di Jacobi, la matrice $M$ è la diagonale $D$ di $A$. Nel metodo di
+Gauss-Seidel $M=D-L$ è la matrice triangolare inferiore di $A$. In entrambi i
+casi, affinché i metodi siano applicabili, è necessario che tutti gli elementi
+della diagonale della matrice $A$ siano diversi da zero. Questo assicura che
+$M$ sia non singolare e quindi invertibile.
+\begin{itemize}
+    \item \textbf{Jacobi:} Indicando con $J$ la matrice di iterazione del
+        metodo di Jacobi, dalla $P=M^{-1}N$ si ha 
+        $$J=D^{-1}(L+U)$$
+        per cui la \ref{eq:metodo_iterativo_matrici} diviene 
+        $$x^{(k)}=Jx^{(k-1)}+q=D^{-1}(L+U)x^{(k-1)}+b)$$
+        con $q=D^{-1}b$.
+        $$
+        \begin{aligned}
+            &=\begin{bmatrix}
+                \frac{1}{a_{11}} & & & \\ 
+                                 & \frac{1}{a_{22}} & & \\ 
+                                 & & \ddots & \\ 
+                                 & & & \frac{1}{a_{nn}}
+            \end{bmatrix}\left(
+                \begin{bmatrix}
+                    0 & a_{12} & a_{13} & \cdots & a_{1n} \\
+                    a_{21} & 0 & a_{23} & \cdots & a_{2n} \\
+                    a_{31} & a_{32} & 0 & \cdots & a_{3n} \\
+                    \vdots & \vdots & \vdots & \ddots & \vdots \\
+                    a_{n1} & a_{n2} & a_{n3} & \cdots & 0
+                    \end{bmatrix}\begin{bmatrix}
+                    x_1^{(k-1)} \\ 
+                    \vdots \\ 
+                    x_n^{(k-1)} 
+                    \end{bmatrix}+\begin{bmatrix}
+                    b_1 \\ 
+                    \vdots \\ 
+                    b_n
+            \end{bmatrix}\right)
+        \end{aligned}
+        $$
+    \item \textbf{Gauss-Seidel.}
+   \end{itemize}
 \end{document}

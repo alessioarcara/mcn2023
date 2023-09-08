@@ -1,0 +1,21 @@
+In questo file sono spiegati i programmi Octave/Matlab messi a disposizione:
+
+spolint_newt_dati interpolazione polinomiale di dati nella forma di Newton
+spolint_lagr_dati interpolazione polinomiale di dati nella forma di Lagrange
+spolint_lagr_fun  interpolazione polinomiale di funzione nella forma di Lagrange 
+lagrval1          valutazione I forma di Lagrange
+lagrval2          valutazione II forma di Lagrange
+lagrange          valutazione funzioni base di Lagrange
+newton            valuta funzioni base di Newton
+newtval           valutazione polinomio nella base di Newton
+lsolve            risolve sistema lineare triangolare inferiore
+bernst            valutazione funzioni base di Bernstein
+decast            valutazione polinomio nella base di Bernstein
+chebyshev         determina zeri del polinomio di Chebyshev di grado n+1
+runge             funzione test di Runge
+fun1, ...,fun7    altre funzioni test
+polfun1, ...,polfun5 funzioni test di tipo polinomiale (tranne la polfun5)
+scond_interp      calcolo condizionamento del problema di interpolazione
+dataset1.dat      set di dati da interpolare
+dataset2.dat
+dataset3.dat
