@@ -1,4 +1,4 @@
-function [xstar]=bisez(fun,a,b,tol)
+function [xstar,n,ak,bk]=bisez(fun,a,b,tol,ftrace)
 %***********************************************************
 % [xstar]=sbisez(fun,a,b,tol)
 % questa routine determina uno zero di una funzione con 
@@ -7,8 +7,11 @@ function [xstar]=bisez(fun,a,b,tol)
 % a,b    --> intervallo di innesco della funzione
 % tol    --> tolleranza richiesta
 % xstar  <-- approssimazione dello zero
+  n=1;
   if ((a<0) & (b>0) & (feval(fun,0)==0))
     xstar=0;
+    ak=a;
+    bk=b;
   else
    fa=feval(fun,a);
    fb=feval(fun,b);
@@ -21,7 +24,12 @@ function [xstar]=bisez(fun,a,b,tol)
      else
        b=xm;
        fb=fxm;
-     end       
+     end
+     n=n+1;
+     if (ftrace>0)
+         ak(n)=a;
+         bk(n)=b;
+     end
     end
     xstar=a+(b-a)./2;
   end

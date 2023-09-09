@@ -33,8 +33,13 @@ end
 plot([a,b],[0,0],'g-','LineWidth',1.5);
 fprintf('[a,b]: %20.15e %20.15e\n',a,b);
 
-[xstar]=bisez(fun,a,b,tol);
+ftrace=1
+[xstar,n,ak, bk]=bisez(fun,a,b,tol,ftrace);
 
 plot(xstar,0,'g+');
 fprintf('zero: %20.15e\n',xstar);
+fprintf('numero iterazioni effettuate: %i\n', n);
+for i=1:length(ak)
+    fprintf('%i° intervallo ab=(%e, %e)\n', i, ak(i), bk(i));
+end
 end
