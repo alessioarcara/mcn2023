@@ -17,14 +17,15 @@ for n=nn
         end
               
         %si fattorizza la matrice A
-        [L,U,P]=...;
+        [L,U,P]=lu(A);
 
-        maxl=...;
+        % max di una matrice genera il max di ciascuna colonna
+        % max(max(...)) -> massimo di tutta la matrice
+        maxl=max(max(abs(L)));
 
-        maxu=...;
-       
-        bound=...;
+        maxu=max(max(abs(U)));
+        bound=2^(n-1)*max(max(abs(A)));
 
         fprintf('%5d %2dx%2d  %14.5f  %14.5e  %14.5e\n',k,n,n,maxl,maxu,bound);
     end
-end                
+end   

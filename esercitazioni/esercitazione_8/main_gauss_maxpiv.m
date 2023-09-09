@@ -1,7 +1,7 @@
 %main_gauss script da completare
 
 %si chiama una funzione che definisce una matrice test
-A=mat_es_1;
+A=mat_es_2;
 
 %si determina la sua dimensione n x m
 [n,m]=size(A);
@@ -18,13 +18,13 @@ if (n == m)
     disp(b);
 
     %si fattorizza la matrice A con Gauss semplice
-    [LU,sing]=LUsimple(A);
+    [LU,p,sing]=LUmaxpiv(A);
        
     if (sing ~= 1)
     % si stampa la fattorizzazione
       disp(LU)
     %si risolve il sistema lineare
-      xx=LUsimple_solve(LU, b);
+      xx=LUmaxpiv_solve(LU, b, p);
     %si stampa la soluzione x
       disp(xx);
     else

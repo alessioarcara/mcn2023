@@ -11,6 +11,7 @@
 %*           necessari un numero pari o dispari di scambi          *
 %*         sing (0) la matrice non e' singolare, (1) e' singolare  *
 %*******************************************************************
+
 function [A,p,sing]=LUmaxpiv(A)
 
   [m,n]=size(A);

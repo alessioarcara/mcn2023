@@ -8,24 +8,28 @@ A=mat_es_7();
 
 %stampa della matrice A
 disp(A);
-
+xstar = ones(2,1)
 %si definisce il vettore dei termini noti
-b=[1 ; 2];
+% b=[1 ; 2];
+b = A*xstar;
 
-%si fattorizza la matrice A
-[]=LUmaxpiv(A);
+%si fattorizzi la matrice A usando la function LUmaxpiv
+[LU, p, sing]=LUmaxpiv(A);
 
 %si risolvono i sistemi piu' semplici usando la function LUmaxpiv_solve
-x1=...;
-
-%si stampa la soluzione x1
-disp(x1);
+if sing==1
+    disp('fattorizzazione LU senza pivoting non riuscita')
+else 
+    disp('Soluzione LU con pivoting')
+    x1=LUmaxpiv_solve(LU, b, p)
+end
 
 %si fattorizzi la matrice A usando la function LUsimple
-...
+[LU, sing]=LUsimple(A);
 
-%si risolva il sistema lineare usando la function LUsimple_solve
-x2=...;
-
-%si stampa la soluzione x2
-disp(x2);
+if sing==1
+    disp('fattorizzazione LU senza pivoting non riuscita')
+else 
+    disp('Soluzione LU senza pivoting')
+    x2=LUsimple_solve(LU, b)
+end

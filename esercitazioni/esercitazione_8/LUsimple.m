@@ -11,7 +11,8 @@ function [A,sing]=LUsimple(A)
   sing = 0;
   k = 1;
   while ((~sing) & (k<n)) 
-    if(A(k,k) ~= 0.0)
+    % if(A(k,k) ~= 0.0)
+    if(abs(A(k,k)) >eps)
       A(k+1:n,k)=-A(k+1:n,k)./A(k,k);
       for j=k+1:n
         if(A(k,j) ~= 0.0)

@@ -3,7 +3,7 @@ function main_hilb(n)
 %con l'effettivo valore sperimentale del numero di condizione sulla 
 %matrice test di Hilbert (function Matlab hilb) 
 x=ones(n,1);
-H=mat_3(n);
+H=hilb(n);
 cH=cond(H);
 b=H*x;
 y=H\b;
