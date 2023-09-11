@@ -33,6 +33,7 @@ if (fp>0)
      for i=1:n+1
       plot([x(i),x(i)],[0,y(i)],'r-');
      end
+    hold off;
 end
 
 end

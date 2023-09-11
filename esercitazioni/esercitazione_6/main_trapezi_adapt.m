@@ -1,5 +1,5 @@
 %script di innesco per trapezi_adapt
-function main_trapezi_adapt(fun,a,b,tol)
+function main_trapezi_adaptn nval=(fun,a,b,tol)
 close all
 tol1=1.0e-12;
 I=quad(fun,a,b,tol1);

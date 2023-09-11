@@ -9,12 +9,12 @@ function err_trapezi_comp(funz,a,b,n)
 % Viene prodotta la stampa di AbsErr
 
   tol=1.0e-12;
-  I=quad(..,..,..,..);
+  I=quad(funz,a,b,tol);
   fprintf('valore I= %22.15e\n',I);
   
   h=(b-a)/n;
-  IA=trapezi_comp(..,..,..,..,0);
-  AbsErr=abs(..);
+  IA=trapezi_comp(funz,a,b,n,0);
+  AbsErr=abs(I-IA);
   fprintf('n  h  IA  AbsErr\n');
   fprintf('%d %14.7e %22.15e %14.7e \n',n,h,IA,AbsErr);
 
