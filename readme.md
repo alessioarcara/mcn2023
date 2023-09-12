@@ -10,6 +10,7 @@
 | [`integration.ipynb`](./esempi/integration.ipynb)      | Formule di quadratura composite e adattive per l'integrazione numerica |
 | [`roots.ipynb`](./esempi/roots.ipynb)                  | Metodi per calcolare le radici di funzioni non lineari               |
 | [`mnc.tex`](./mnc.tex)                                 | Appunti del corso                                                    |
+| [`esercitazione_4.ipynb`](./esercitazioni/esercitazione_4/esercitazione.ipynb) | Esercitazione 4                              |
 | [`esercitazione_5.ipynb`](./esercitazioni/esercitazione_5/esercitazione.ipynb) | Esercitazione 5                              |
 | [`esercitazione_6.ipynb`](./esercitazioni/esercitazione_6/esercitazione.ipynb) | Esercitazione 6                              |
 | [`esercitazione_7.ipynb`](./esercitazioni/esercitazione_7/esercitazione.ipynb) | Esercitazione 7                              |
