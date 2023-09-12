@@ -45,5 +45,5 @@ plot(dx,zeros(1,m),'k-','LineWidth',1.5);
 
 %grafico dell'errore relativo
 figure(2);
-relerr=abs((sy-dy)./dy);
-plot(dx,relerr,'b.-');
+err_rel=abs((sy-dy)./abs(dy));
+plot(dx,err_rel,'b.-');

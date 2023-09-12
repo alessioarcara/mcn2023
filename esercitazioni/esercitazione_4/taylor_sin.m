@@ -5,7 +5,7 @@
 % n  --> grado >= 0
 % x0 --> valore in [0,3pi]
 function taylor_sin(n,x0)
-%valutazione e disegno di sin(x)
+%RAPPRESENTAZIONE ESATTA: valutazione e disegno di sin(x)
 a=0;
 b=3*pi;
 m=100;
@@ -21,9 +21,10 @@ wmax=2.5;
 axis([a,b,wmin,wmax]);
 plot(x,ys,'r-');
 
-%sviluppo di Taylor di sin(x)
+%APPROSSIMAZIONE: sviluppo di Taylor di sin(x)
 sinx0=sin(x0);
 cosx0=cos(x0);
+%derivate
 sc=[sinx0,cosx0,-sinx0,-cosx0];
 c=zeros(1,n+1);
 c(1)=sc(1);
@@ -37,6 +38,7 @@ xx=x-x0;
 c=fliplr(c);
 yp=polyval(c,xx);
 plot(x,yp,'b-');
+legend('Seno', 'Polinomio di Taylor')
 
 %valutazione Errore Analitico assoluto discreto in un intorno my_eps di x0
 my_eps=0.5;

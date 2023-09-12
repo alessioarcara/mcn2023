@@ -19,8 +19,15 @@ function y=poly_eval(c,x)
 %                                ---------- p -------------
 
 %1-mediante chiamata alla built-in function Octave/Matlab polyval()
-y=polyval(c,x);
+% y=polyval(c,x);
 
 %2-mediante implementazione esplicita
-
-% TO DO
+m=length(x);
+n=length(c);
+for i=1:m
+    y(i)=c(1);
+    for k=2:n
+        y(i)=c(k)+x(i)*y(i);
+    end
+end
+    

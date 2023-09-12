@@ -1,13 +1,10 @@
-%script gittata
-%dati
+%gittata
 g=9.8;
-v0=200;
-n=31;
-ang=linspace(0,pi/2,n);
-
+v0=100;
+ang=linspace(0,pi/2,41);
 %in alternativa
-% ang=0:0.05:pi/2;
-% n=length(ang);
+%ang=0:0.05:pi/2;
+n=length(ang);
 
 R=v0^2/g*sin(2.*ang);
 

@@ -50,7 +50,7 @@ switch (k)
         a=0; b=1;
         x=linspace(a,b,n);
         xi=linspace(a,b,g+1);
-        y=sqrt(1-xi);
+        c=sqrt(1-xi);
         y=sqrt(1-x);
 end
 
@@ -58,27 +58,29 @@ end
 % bma=b-a;
 % t=(x-a)/bma;
 % bs=bernst01(g,t);
-% y3=(bs*c')';
+% yy=(bs*c')';
 
 %algoritmo formula ricorrente base Bernstein in [a,b]
 bs=bernst(g,x,a,b);
-y3=(bs*c')';
+%prodotto vettore 1xn per matrice nxn
+yy=(bs*c')';
 
 % %algoritmo di de Casteljau in [0,1]
 % t=(x-a)/(b-a);
-% y3=decast(c,t);
+% yy=decast(c,t);
 
 figure(1)
 plot([a,b]',[0,0]','r');
 hold on;
 plot(x,y,'g-');
-plot(x,y3,'r-');
+plot(x,yy,'r-');
 % per visionare l'interpretazione geometrica sui coefficienti
-% plot(linspace(a,b,g+1),c,'b+-');
+plot(linspace(a,b,g+1),c,'b+-');
+legend('funzione', 'polinomio di Bernstein')
 
 figure(2)
 hold on;
-err=abs(y-y3);
+err=abs(y-yy);
 plot(x,err,'g-');
 fprintf('Max.Err. %e\n',max(err));
 

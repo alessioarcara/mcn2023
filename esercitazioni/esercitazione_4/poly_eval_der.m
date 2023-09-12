@@ -15,7 +15,11 @@ function [y,y1]=poly_eval_der(c,x)
 n=length(c);
 m=length(x);
 %Ciclo sui punti di valutazione
-
-% TO DO
-
+for i = 1:m
+    y(i) = c(1);
+    y1(i) = 0;
+    for k = 2:n
+        y1(i) = y(i) + x(i) * y1(i);
+        y(i) = c(k) + x(i) * y(i);
+    end
 end
