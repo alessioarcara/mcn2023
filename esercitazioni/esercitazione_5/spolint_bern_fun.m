@@ -1,17 +1,6 @@
-function spolint_lagr_fun(n,tipo)
-% script spolint_lagr_fun.m
-% Interpolante polinomiale di grado n di una funzione test:
-% si utilizza la forma di Lagrange;
-% scegliere la funzione test
-% n      : grado del polinomio interpolante
-% tipo   : tipo di distribuzione dei punti 1=equispaziati 2=chebyshev
-% Viene prodotto il grafico della funzione test, del polinomio interpolante
-% e dei punti di interpolazione
-
-% scelta funzione test e intervallo di definizione
-f=@(x) runge(x);
-a=-5;
-b=5;
+function polint_lagr_fun(fun_name,a,b,n,tipo)
+% Scelta della funzione test
+f = str2func(fun_name);
 
 % scelta punti di interpolazione
 if (tipo==1)
@@ -22,11 +11,14 @@ else
     x=chebyshev(a,b,n);
 end
 y=f(x);
+    
+B=bernst(n-1,x,a,b);
+d=B\y';
 
 %punti su cui valutare l'interpolante polinomiale
 m=51;
 xv=linspace(a,b,m*n+1);
-yv=lagrval2(y,x,xv);
+yv=decast(d,xv,a,b);
 
 %valutazione funzione test nei punti di rappresentazione grafica
 yf=f(xv);
