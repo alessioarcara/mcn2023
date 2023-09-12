@@ -1,12 +1,15 @@
-%Script sconv_dec2bin.m
+function sconv_dec2bin(z,k)
 %************************************************
-%Codice per la conversione da base 10 a base 2
-%di un numero in virgola
+% z: numero reale
+% k: numero max. di cifre per la parte frazionaria
+% Codice per la conversione da base 10 a base 2
+% di un numero in virgola
 %************************************************
-clear all
+    
+% clear all
 disp('Converte un reale (parte intera e frazionaria) da base 10 a base 2');
-z=input('dai il numero reale: ');
-k=input('dai il numero max. di cifre per la parte frazionaria: ');
+% z=input('dai il numero reale: ');
+% k=input('dai il numero max. di cifre per la parte frazionaria: ');
 b=2;
 zint=fix(z);
 z=z-zint;

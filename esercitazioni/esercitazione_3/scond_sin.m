@@ -3,7 +3,9 @@
 %condizionamento del problema y=fun(x) con fun(x)=sin(x)
 %*******************************************************
 clear all;
-xD = [pi, pi/2, 0];
+eps1=2^-12;
+eps2=2^-24;
+xD = [pi, pi+eps1, pi+eps2, pi/2, pi/2+eps1, pi/2+eps2, eps1, eps2];
 xS = single(xD); % force single format
 fxS = fun(xS);
 fxD = fun(xD);
